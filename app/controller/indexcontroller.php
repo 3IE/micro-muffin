@@ -22,32 +22,10 @@ class IndexController extends \Lib\Controller
 
     public function index($params = array())
     {
-        /** @var User $user */
-        //$user = User::find(6);
-        //var_dump($user);
-        //$user->setLogin("'élu'");
         $user = new User();
         $user->setLogin("mathieu");
         $user->save();
 
-        //var_dump(User::)
-
-        /*
-                $pdo = \Lib\PDOS::getInstance();
-                $req = $pdo->prepare('SELECT * FROM users');
-                $req->execute();
-
-                var_dump($req->fetchAll());
-
-                //$req = $pdo->prepare("SELECT getusers()");
-                //$req->execute();
-
-                //var_dump($req->fetchAll());
-
-                pg_connect('host=localhost port=5432 dbname=micro-muffin user=micro-muffin password=root');
-                $req = pg_query("SELECT * FROM getusers()");
-                var_dump(pg_fetch_all($req));
-        */
 
         $this->set("mavar", "cocorico");
         $this->render = "false";

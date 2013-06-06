@@ -9,9 +9,9 @@
 
 /* Database configuration */
 define('DBHOST', 'localhost');
-define('DBNAME', 'micro-muffin');
-define('DBUSER', 'micro-muffin');
-define('DBPASS', 'root');
+define('DBNAME', 'micro');
+define('DBUSER', 'micro');
+define('DBPASS', 'micro');
 define('DISPLAY_SQL_ERROR', true);
 
 define('BASE_DIR', '');

@@ -41,4 +41,34 @@ class Controller
   {
     return $this->render;
   }
+
+  /**
+   * @return void
+   */
+  public function redirect($url)
+  {
+      header("Location: ".$url);
+      die();
+  }
+
+  public static function setIntented($intented)
+  {
+    $_SESSION["intented"] = $intented;
+  }
+
+  public static function getIntented()
+  {
+    if (isset($_SESSION["intented"]) == false)
+      return "";
+    return $_SESSION["intented"];
+  }
+
+  public function redirect_intented()
+  {
+      if (isset($_SESSION["intented"]) == false)
+        header("Location: /");
+      else
+        header("Location: ".$_SESSION["intented"]);
+      die();
+  }
 }
