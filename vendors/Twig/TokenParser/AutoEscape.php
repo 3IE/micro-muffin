@@ -41,23 +41,30 @@ class Twig_TokenParser_AutoEscape extends Twig_TokenParser
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        if ($stream->test(Twig_Token::BLOCK_END_TYPE)) {
+        if ($stream->test(Twig_Token::BLOCK_END_TYPE))
+        {
             $value = 'html';
-        } else {
+        }
+        else
+        {
             $expr = $this->parser->getExpressionParser()->parseExpression();
-            if (!$expr instanceof Twig_Node_Expression_Constant) {
+            if (!$expr instanceof Twig_Node_Expression_Constant)
+            {
                 throw new Twig_Error_Syntax('An escaping strategy must be a string or a Boolean.', $stream->getCurrent()->getLine(), $stream->getFilename());
             }
             $value = $expr->getAttribute('value');
 
             $compat = true === $value || false === $value;
 
-            if (true === $value) {
+            if (true === $value)
+            {
                 $value = 'html';
             }
 
-            if ($compat && $stream->test(Twig_Token::NAME_TYPE)) {
-                if (false === $value) {
+            if ($compat && $stream->test(Twig_Token::NAME_TYPE))
+            {
+                if (false === $value)
+                {
                     throw new Twig_Error_Syntax('Unexpected escaping strategy as you set autoescaping to false.', $stream->getCurrent()->getLine(), $stream->getFilename());
                 }
 

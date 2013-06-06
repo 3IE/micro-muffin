@@ -37,19 +37,23 @@ class Twig_TokenParser_Use extends Twig_TokenParser
         $template = $this->parser->getExpressionParser()->parseExpression();
         $stream = $this->parser->getStream();
 
-        if (!$template instanceof Twig_Node_Expression_Constant) {
+        if (!$template instanceof Twig_Node_Expression_Constant)
+        {
             throw new Twig_Error_Syntax('The template references in a "use" statement must be a string.', $stream->getCurrent()->getLine(), $stream->getFilename());
         }
 
         $targets = array();
-        if ($stream->test('with')) {
+        if ($stream->test('with'))
+        {
             $stream->next();
 
-            do {
+            do
+            {
                 $name = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
 
                 $alias = $name;
-                if ($stream->test('as')) {
+                if ($stream->test('as'))
+                {
                     $stream->next();
 
                     $alias = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
@@ -57,7 +61,8 @@ class Twig_TokenParser_Use extends Twig_TokenParser
 
                 $targets[$name] = new Twig_Node_Expression_Constant($alias, -1);
 
-                if (!$stream->test(Twig_Token::PUNCTUATION_TYPE, ',')) {
+                if (!$stream->test(Twig_Token::PUNCTUATION_TYPE, ','))
+                {
                     break;
                 }
 

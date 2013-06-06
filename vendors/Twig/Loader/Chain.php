@@ -27,7 +27,8 @@ class Twig_Loader_Chain implements Twig_LoaderInterface, Twig_ExistsLoaderInterf
     public function __construct(array $loaders = array())
     {
         $this->loaders = array();
-        foreach ($loaders as $loader) {
+        foreach ($loaders as $loader)
+        {
             $this->addLoader($loader);
         }
     }
@@ -49,14 +50,18 @@ class Twig_Loader_Chain implements Twig_LoaderInterface, Twig_ExistsLoaderInterf
     public function getSource($name)
     {
         $exceptions = array();
-        foreach ($this->loaders as $loader) {
-            if ($loader instanceof Twig_ExistsLoaderInterface && !$loader->exists($name)) {
+        foreach ($this->loaders as $loader)
+        {
+            if ($loader instanceof Twig_ExistsLoaderInterface && !$loader->exists($name))
+            {
                 continue;
             }
 
-            try {
+            try
+            {
                 return $loader->getSource($name);
-            } catch (Twig_Error_Loader $e) {
+            } catch (Twig_Error_Loader $e)
+            {
                 $exceptions[] = $e->getMessage();
             }
         }
@@ -69,22 +74,27 @@ class Twig_Loader_Chain implements Twig_LoaderInterface, Twig_ExistsLoaderInterf
      */
     public function exists($name)
     {
-        $name = (string) $name;
+        $name = (string)$name;
 
-        if (isset($this->hasSourceCache[$name])) {
+        if (isset($this->hasSourceCache[$name]))
+        {
             return $this->hasSourceCache[$name];
         }
 
-        foreach ($this->loaders as $loader) {
-            if ($loader instanceof Twig_ExistsLoaderInterface && $loader->exists($name)) {
+        foreach ($this->loaders as $loader)
+        {
+            if ($loader instanceof Twig_ExistsLoaderInterface && $loader->exists($name))
+            {
                 return $this->hasSourceCache[$name] = true;
             }
 
-            try {
+            try
+            {
                 $loader->getSource($name);
 
                 return $this->hasSourceCache[$name] = true;
-            } catch (Twig_Error_Loader $e) {
+            } catch (Twig_Error_Loader $e)
+            {
             }
         }
 
@@ -97,15 +107,19 @@ class Twig_Loader_Chain implements Twig_LoaderInterface, Twig_ExistsLoaderInterf
     public function getCacheKey($name)
     {
         $exceptions = array();
-        foreach ($this->loaders as $loader) {
-            if ($loader instanceof Twig_ExistsLoaderInterface && !$loader->exists($name)) {
+        foreach ($this->loaders as $loader)
+        {
+            if ($loader instanceof Twig_ExistsLoaderInterface && !$loader->exists($name))
+            {
                 continue;
             }
 
-            try {
+            try
+            {
                 return $loader->getCacheKey($name);
-            } catch (Twig_Error_Loader $e) {
-                $exceptions[] = get_class($loader).': '.$e->getMessage();
+            } catch (Twig_Error_Loader $e)
+            {
+                $exceptions[] = get_class($loader) . ': ' . $e->getMessage();
             }
         }
 
@@ -118,15 +132,19 @@ class Twig_Loader_Chain implements Twig_LoaderInterface, Twig_ExistsLoaderInterf
     public function isFresh($name, $time)
     {
         $exceptions = array();
-        foreach ($this->loaders as $loader) {
-            if ($loader instanceof Twig_ExistsLoaderInterface && !$loader->exists($name)) {
+        foreach ($this->loaders as $loader)
+        {
+            if ($loader instanceof Twig_ExistsLoaderInterface && !$loader->exists($name))
+            {
                 continue;
             }
 
-            try {
+            try
+            {
                 return $loader->isFresh($name, $time);
-            } catch (Twig_Error_Loader $e) {
-                $exceptions[] = get_class($loader).': '.$e->getMessage();
+            } catch (Twig_Error_Loader $e)
+            {
+                $exceptions[] = get_class($loader) . ': ' . $e->getMessage();
             }
         }
 

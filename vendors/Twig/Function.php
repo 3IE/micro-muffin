@@ -26,8 +26,8 @@ abstract class Twig_Function implements Twig_FunctionInterface, Twig_FunctionCal
     {
         $this->options = array_merge(array(
             'needs_environment' => false,
-            'needs_context'     => false,
-            'callable'          => null,
+            'needs_context' => false,
+            'callable' => null,
         ), $options);
     }
 
@@ -53,11 +53,13 @@ abstract class Twig_Function implements Twig_FunctionInterface, Twig_FunctionCal
 
     public function getSafe(Twig_Node $functionArgs)
     {
-        if (isset($this->options['is_safe'])) {
+        if (isset($this->options['is_safe']))
+        {
             return $this->options['is_safe'];
         }
 
-        if (isset($this->options['is_safe_callback'])) {
+        if (isset($this->options['is_safe_callback']))
+        {
             return call_user_func($this->options['is_safe_callback'], $functionArgs);
         }
 

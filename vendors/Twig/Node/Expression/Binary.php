@@ -26,14 +26,12 @@ abstract class Twig_Node_Expression_Binary extends Twig_Node_Expression
         $compiler
             ->raw('(')
             ->subcompile($this->getNode('left'))
-            ->raw(' ')
-        ;
+            ->raw(' ');
         $this->operator($compiler);
         $compiler
             ->raw(' ')
             ->subcompile($this->getNode('right'))
-            ->raw(')')
-        ;
+            ->raw(')');
     }
 
     abstract public function operator(Twig_Compiler $compiler);

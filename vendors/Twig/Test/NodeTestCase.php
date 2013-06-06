@@ -40,7 +40,8 @@ abstract class Twig_Test_NodeTestCase extends PHPUnit_Framework_TestCase
 
     protected function getVariableGetter($name)
     {
-        if (version_compare(phpversion(), '5.4.0RC1', '>=')) {
+        if (version_compare(phpversion(), '5.4.0RC1', '>='))
+        {
             return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
         }
 
@@ -49,7 +50,8 @@ abstract class Twig_Test_NodeTestCase extends PHPUnit_Framework_TestCase
 
     protected function getAttributeGetter()
     {
-        if (function_exists('twig_template_get_attributes')) {
+        if (function_exists('twig_template_get_attributes'))
+        {
             return 'twig_template_get_attributes($this, ';
         }
 

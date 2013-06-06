@@ -29,19 +29,20 @@ class Twig_Node_Expression_Parent extends Twig_Node_Expression
      */
     public function compile(Twig_Compiler $compiler)
     {
-        if ($this->getAttribute('output')) {
+        if ($this->getAttribute('output'))
+        {
             $compiler
                 ->addDebugInfo($this)
                 ->write("\$this->displayParentBlock(")
                 ->string($this->getAttribute('name'))
-                ->raw(", \$context, \$blocks);\n")
-            ;
-        } else {
+                ->raw(", \$context, \$blocks);\n");
+        }
+        else
+        {
             $compiler
                 ->raw("\$this->renderParentBlock(")
                 ->string($this->getAttribute('name'))
-                ->raw(", \$context, \$blocks)")
-            ;
+                ->raw(", \$context, \$blocks)");
         }
     }
 }

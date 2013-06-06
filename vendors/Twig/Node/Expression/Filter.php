@@ -27,7 +27,8 @@ class Twig_Node_Expression_Filter extends Twig_Node_Expression_Call
         $this->setAttribute('needs_environment', $filter->needsEnvironment());
         $this->setAttribute('needs_context', $filter->needsContext());
         $this->setAttribute('arguments', $filter->getArguments());
-        if ($filter instanceof Twig_FilterCallableInterface || $filter instanceof Twig_SimpleFilter) {
+        if ($filter instanceof Twig_FilterCallableInterface || $filter instanceof Twig_SimpleFilter)
+        {
             $this->setAttribute('callable', $filter->getCallable());
         }
 

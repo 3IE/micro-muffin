@@ -27,13 +27,18 @@ class Twig_Node_Expression_Test_Defined extends Twig_Node_Expression_Test
     {
         parent::__construct($node, $name, $arguments, $lineno);
 
-        if ($node instanceof Twig_Node_Expression_Name) {
+        if ($node instanceof Twig_Node_Expression_Name)
+        {
             $node->setAttribute('is_defined_test', true);
-        } elseif ($node instanceof Twig_Node_Expression_GetAttr) {
+        }
+        elseif ($node instanceof Twig_Node_Expression_GetAttr)
+        {
             $node->setAttribute('is_defined_test', true);
 
             $this->changeIgnoreStrictCheck($node);
-        } else {
+        }
+        else
+        {
             throw new Twig_Error_Syntax('The "defined" test only works with simple variables', $this->getLine());
         }
     }
@@ -42,7 +47,8 @@ class Twig_Node_Expression_Test_Defined extends Twig_Node_Expression_Test
     {
         $node->setAttribute('ignore_strict_check', true);
 
-        if ($node->getNode('node') instanceof Twig_Node_Expression_GetAttr) {
+        if ($node->getNode('node') instanceof Twig_Node_Expression_GetAttr)
+        {
             $this->changeIgnoreStrictCheck($node->getNode('node'));
         }
     }

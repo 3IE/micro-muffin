@@ -16,7 +16,7 @@ class Twig_Extension_Sandbox extends Twig_Extension
 
     public function __construct(Twig_Sandbox_SecurityPolicyInterface $policy, $sandboxed = false)
     {
-        $this->policy            = $policy;
+        $this->policy = $policy;
         $this->sandboxedGlobally = $sandboxed;
     }
 
@@ -72,28 +72,32 @@ class Twig_Extension_Sandbox extends Twig_Extension
 
     public function checkSecurity($tags, $filters, $functions)
     {
-        if ($this->isSandboxed()) {
+        if ($this->isSandboxed())
+        {
             $this->policy->checkSecurity($tags, $filters, $functions);
         }
     }
 
     public function checkMethodAllowed($obj, $method)
     {
-        if ($this->isSandboxed()) {
+        if ($this->isSandboxed())
+        {
             $this->policy->checkMethodAllowed($obj, $method);
         }
     }
 
     public function checkPropertyAllowed($obj, $method)
     {
-        if ($this->isSandboxed()) {
+        if ($this->isSandboxed())
+        {
             $this->policy->checkPropertyAllowed($obj, $method);
         }
     }
 
     public function ensureToStringAllowed($obj)
     {
-        if (is_object($obj)) {
+        if (is_object($obj))
+        {
             $this->policy->checkMethodAllowed($obj, '__toString');
         }
 

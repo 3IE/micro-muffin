@@ -13,7 +13,7 @@ class IndexController extends \Lib\Controller
     {
         $array = array();
         var_dump(get_object_vars($object));
-        foreach(get_class_vars(get_class($object)) as $k => $v)
+        foreach (get_class_vars(get_class($object)) as $k => $v)
         {
             $array[$k] = $v;
         }
@@ -22,30 +22,21 @@ class IndexController extends \Lib\Controller
 
     public function index($params = array())
     {
-
-        /*
-        $sql = \Lib\PDOS::getInstance();
-
-
-        $toto = $sql->prepare("SELECT all_users3()");
-        $toto->execute();
-
-        //var_dump($toto->fetchAll(PDO::FETCH_COLUMN));
-
-
-        $obj = array();
-        foreach ($toto->fetchAll(PDO::FETCH_COLUMN) as $t)
-        {
-            $obj[] = json_decode($t);
-        }
-
-        var_dump($obj);
-
-        var_dump($obj[0]->login);
-*/
         $user = User::find(2);
         $user->save();
 
+        /*
+        $pdo = \Lib\PDOS::getInstance();
+        $req = $pdo->prepare('SELECT * FROM users');
+        $req->execute();
+
+        var_dump($req->fetchAll());
+
+        $req = $pdo->prepare("SELECT getusers()");
+        $req->execute();
+
+        var_dump($req->fetchAll());
+        */
 
         $this->set("mavar", "cocorico");
     }

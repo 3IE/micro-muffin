@@ -48,13 +48,12 @@ class Twig_Node_SandboxedModule extends Twig_Node_Module
             ->indent()
             ->write("\$this->env->getExtension('sandbox')->checkSecurity(\n")
             ->indent()
-            ->write(!$this->usedTags ? "array(),\n" : "array('".implode('\', \'', $this->usedTags)."'),\n")
-            ->write(!$this->usedFilters ? "array(),\n" : "array('".implode('\', \'', $this->usedFilters)."'),\n")
-            ->write(!$this->usedFunctions ? "array()\n" : "array('".implode('\', \'', $this->usedFunctions)."')\n")
+            ->write(!$this->usedTags ? "array(),\n" : "array('" . implode('\', \'', $this->usedTags) . "'),\n")
+            ->write(!$this->usedFilters ? "array(),\n" : "array('" . implode('\', \'', $this->usedFilters) . "'),\n")
+            ->write(!$this->usedFunctions ? "array()\n" : "array('" . implode('\', \'', $this->usedFunctions) . "')\n")
             ->outdent()
             ->write(");\n")
             ->outdent()
-            ->write("}\n\n")
-        ;
+            ->write("}\n\n");
     }
 }

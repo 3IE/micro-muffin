@@ -20,7 +20,6 @@ class Twig_Node_Expression_TempName extends Twig_Node_Expression
         $compiler
             ->raw('$_')
             ->raw($this->getAttribute('name'))
-            ->raw('_')
-        ;
+            ->raw('_');
     }
 }

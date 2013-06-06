@@ -27,10 +27,10 @@ class Twig_SimpleFunction
         $this->callable = $callable;
         $this->options = array_merge(array(
             'needs_environment' => false,
-            'needs_context'     => false,
-            'is_safe'           => null,
-            'is_safe_callback'  => null,
-            'node_class'        => 'Twig_Node_Expression_Function',
+            'needs_context' => false,
+            'is_safe' => null,
+            'is_safe_callback' => null,
+            'node_class' => 'Twig_Node_Expression_Function',
         ), $options);
     }
 
@@ -71,11 +71,13 @@ class Twig_SimpleFunction
 
     public function getSafe(Twig_Node $functionArgs)
     {
-        if (null !== $this->options['is_safe']) {
+        if (null !== $this->options['is_safe'])
+        {
             return $this->options['is_safe'];
         }
 
-        if (null !== $this->options['is_safe_callback']) {
+        if (null !== $this->options['is_safe_callback'])
+        {
             return call_user_func($this->options['is_safe_callback'], $functionArgs);
         }
 

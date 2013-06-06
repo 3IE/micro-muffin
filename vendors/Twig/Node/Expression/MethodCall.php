@@ -14,7 +14,8 @@ class Twig_Node_Expression_MethodCall extends Twig_Node_Expression
     {
         parent::__construct(array('node' => $node, 'arguments' => $arguments), array('method' => $method, 'safe' => false), $lineno);
 
-        if ($node instanceof Twig_Node_Expression_Name) {
+        if ($node instanceof Twig_Node_Expression_Name)
+        {
             $node->setAttribute('always_defined', true);
         }
     }
@@ -25,11 +26,12 @@ class Twig_Node_Expression_MethodCall extends Twig_Node_Expression
             ->subcompile($this->getNode('node'))
             ->raw('->')
             ->raw($this->getAttribute('method'))
-            ->raw('(')
-        ;
+            ->raw('(');
         $first = true;
-        foreach ($this->getNode('arguments')->getKeyValuePairs() as $pair) {
-            if (!$first) {
+        foreach ($this->getNode('arguments')->getKeyValuePairs() as $pair)
+        {
+            if (!$first)
+            {
                 $compiler->raw(', ');
             }
             $first = false;

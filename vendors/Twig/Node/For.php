@@ -23,7 +23,8 @@ class Twig_Node_For extends Twig_Node
     {
         $body = new Twig_Node(array($body, $this->loop = new Twig_Node_ForLoop($lineno, $tag)));
 
-        if (null !== $ifexpr) {
+        if (null !== $ifexpr)
+        {
             $body = new Twig_Node_If(new Twig_Node(array($ifexpr, $body)), null, $lineno, $tag);
         }
 
@@ -43,24 +44,25 @@ class Twig_Node_For extends Twig_Node
             ->write("\$context['_parent'] = (array) \$context;\n")
             ->write("\$context['_seq'] = twig_ensure_traversable(")
             ->subcompile($this->getNode('seq'))
-            ->raw(");\n")
-        ;
+            ->raw(");\n");
 
-        if (null !== $this->getNode('else')) {
+        if (null !== $this->getNode('else'))
+        {
             $compiler->write("\$context['_iterated'] = false;\n");
         }
 
-        if ($this->getAttribute('with_loop')) {
+        if ($this->getAttribute('with_loop'))
+        {
             $compiler
                 ->write("\$context['loop'] = array(\n")
                 ->write("  'parent' => \$context['_parent'],\n")
                 ->write("  'index0' => 0,\n")
                 ->write("  'index'  => 1,\n")
                 ->write("  'first'  => true,\n")
-                ->write(");\n")
-            ;
+                ->write(");\n");
 
-            if (!$this->getAttribute('ifexpr')) {
+            if (!$this->getAttribute('ifexpr'))
+            {
                 $compiler
                     ->write("if (is_array(\$context['_seq']) || (is_object(\$context['_seq']) && \$context['_seq'] instanceof Countable)) {\n")
                     ->indent()
@@ -70,8 +72,7 @@ class Twig_Node_For extends Twig_Node
                     ->write("\$context['loop']['length'] = \$length;\n")
                     ->write("\$context['loop']['last'] = 1 === \$length;\n")
                     ->outdent()
-                    ->write("}\n")
-                ;
+                    ->write("}\n");
             }
         }
 
@@ -88,23 +89,22 @@ class Twig_Node_For extends Twig_Node
             ->indent()
             ->subcompile($this->getNode('body'))
             ->outdent()
-            ->write("}\n")
-        ;
+            ->write("}\n");
 
-        if (null !== $this->getNode('else')) {
+        if (null !== $this->getNode('else'))
+        {
             $compiler
                 ->write("if (!\$context['_iterated']) {\n")
                 ->indent()
                 ->subcompile($this->getNode('else'))
                 ->outdent()
-                ->write("}\n")
-            ;
+                ->write("}\n");
         }
 
         $compiler->write("\$_parent = \$context['_parent'];\n");
 
         // remove some "private" loop variables (needed for nested loops)
-        $compiler->write('unset($context[\'_seq\'], $context[\'_iterated\'], $context[\''.$this->getNode('key_target')->getAttribute('name').'\'], $context[\''.$this->getNode('value_target')->getAttribute('name').'\'], $context[\'_parent\'], $context[\'loop\']);'."\n");
+        $compiler->write('unset($context[\'_seq\'], $context[\'_iterated\'], $context[\'' . $this->getNode('key_target')->getAttribute('name') . '\'], $context[\'' . $this->getNode('value_target')->getAttribute('name') . '\'], $context[\'_parent\'], $context[\'loop\']);' . "\n");
 
         // keep the values set in the inner context for variables defined in the outer context
         $compiler->write("\$context = array_intersect_key(\$context, \$_parent) + \$_parent;\n");

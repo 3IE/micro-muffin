@@ -21,31 +21,31 @@ class Twig_Token
     protected $type;
     protected $lineno;
 
-    const EOF_TYPE                  = -1;
-    const TEXT_TYPE                 = 0;
-    const BLOCK_START_TYPE          = 1;
-    const VAR_START_TYPE            = 2;
-    const BLOCK_END_TYPE            = 3;
-    const VAR_END_TYPE              = 4;
-    const NAME_TYPE                 = 5;
-    const NUMBER_TYPE               = 6;
-    const STRING_TYPE               = 7;
-    const OPERATOR_TYPE             = 8;
-    const PUNCTUATION_TYPE          = 9;
-    const INTERPOLATION_START_TYPE  = 10;
-    const INTERPOLATION_END_TYPE    = 11;
+    const EOF_TYPE = -1;
+    const TEXT_TYPE = 0;
+    const BLOCK_START_TYPE = 1;
+    const VAR_START_TYPE = 2;
+    const BLOCK_END_TYPE = 3;
+    const VAR_END_TYPE = 4;
+    const NAME_TYPE = 5;
+    const NUMBER_TYPE = 6;
+    const STRING_TYPE = 7;
+    const OPERATOR_TYPE = 8;
+    const PUNCTUATION_TYPE = 9;
+    const INTERPOLATION_START_TYPE = 10;
+    const INTERPOLATION_END_TYPE = 11;
 
     /**
      * Constructor.
      *
      * @param integer $type   The type of the token
-     * @param string  $value  The token value
+     * @param string $value  The token value
      * @param integer $lineno The line position in the source
      */
     public function __construct($type, $value, $lineno)
     {
-        $this->type   = $type;
-        $this->value  = $value;
+        $this->type = $type;
+        $this->value = $value;
         $this->lineno = $lineno;
     }
 
@@ -67,14 +67,15 @@ class Twig_Token
      * * type and value (or array of possible values)
      * * just value (or array of possible values) (NAME_TYPE is used as type)
      *
-     * @param array|integer     $type   The type to test
+     * @param array|integer $type   The type to test
      * @param array|string|null $values The token value
      *
      * @return Boolean
      */
     public function test($type, $values = null)
     {
-        if (null === $values && !is_int($type)) {
+        if (null === $values && !is_int($type))
+        {
             $values = $type;
             $type = self::NAME_TYPE;
         }
@@ -127,7 +128,8 @@ class Twig_Token
      */
     public static function typeToString($type, $short = false, $line = -1)
     {
-        switch ($type) {
+        switch ($type)
+        {
             case self::EOF_TYPE:
                 $name = 'EOF_TYPE';
                 break;
@@ -171,7 +173,7 @@ class Twig_Token
                 throw new LogicException(sprintf('Token of type "%s" does not exist.', $type));
         }
 
-        return $short ? $name : 'Twig_Token::'.$name;
+        return $short ? $name : 'Twig_Token::' . $name;
     }
 
     /**
@@ -184,7 +186,8 @@ class Twig_Token
      */
     public static function typeToEnglish($type, $line = -1)
     {
-        switch ($type) {
+        switch ($type)
+        {
             case self::EOF_TYPE:
                 return 'end of template';
             case self::TEXT_TYPE:

@@ -32,11 +32,13 @@ class Twig_TokenParser_From extends Twig_TokenParser
         $stream->expect('import');
 
         $targets = array();
-        do {
+        do
+        {
             $name = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
 
             $alias = $name;
-            if ($stream->test('as')) {
+            if ($stream->test('as'))
+            {
                 $stream->next();
 
                 $alias = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
@@ -44,7 +46,8 @@ class Twig_TokenParser_From extends Twig_TokenParser
 
             $targets[$name] = $alias;
 
-            if (!$stream->test(Twig_Token::PUNCTUATION_TYPE, ',')) {
+            if (!$stream->test(Twig_Token::PUNCTUATION_TYPE, ','))
+            {
                 break;
             }
 
@@ -55,8 +58,9 @@ class Twig_TokenParser_From extends Twig_TokenParser
 
         $node = new Twig_Node_Import($macro, new Twig_Node_Expression_AssignName($this->parser->getVarName(), $token->getLine()), $token->getLine(), $this->getTag());
 
-        foreach ($targets as $name => $alias) {
-            $this->parser->addImportedSymbol('function', $alias, 'get'.$name, $node->getNode('var'));
+        foreach ($targets as $name => $alias)
+        {
+            $this->parser->addImportedSymbol('function', $alias, 'get' . $name, $node->getNode('var'));
         }
 
         return $node;

@@ -32,7 +32,6 @@ class Twig_Node_Embed extends Twig_Node_Include
             ->string($this->getAttribute('filename'))
             ->raw(', ')
             ->string($this->getAttribute('index'))
-            ->raw(")")
-        ;
+            ->raw(")");
     }
 }

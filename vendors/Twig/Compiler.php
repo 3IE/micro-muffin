@@ -66,7 +66,7 @@ class Twig_Compiler implements Twig_CompilerInterface
      * Compiles a node.
      *
      * @param Twig_NodeInterface $node        The node to compile
-     * @param integer            $indentation The current indentation
+     * @param integer $indentation The current indentation
      *
      * @return Twig_Compiler The current compiler instance
      */
@@ -79,7 +79,8 @@ class Twig_Compiler implements Twig_CompilerInterface
         $this->sourceLine = 1;
         $this->indentation = $indentation;
 
-        if ($node instanceof Twig_Node_Module) {
+        if ($node instanceof Twig_Node_Module)
+        {
             $this->filename = $node->getAttribute('filename');
         }
 
@@ -90,7 +91,8 @@ class Twig_Compiler implements Twig_CompilerInterface
 
     public function subcompile(Twig_NodeInterface $node, $raw = true)
     {
-        if (false === $raw) {
+        if (false === $raw)
+        {
             $this->addIndentation();
         }
 
@@ -121,7 +123,8 @@ class Twig_Compiler implements Twig_CompilerInterface
     public function write()
     {
         $strings = func_get_args();
-        foreach ($strings as $string) {
+        foreach ($strings as $string)
+        {
             $this->addIndentation();
             $this->source .= $string;
         }
@@ -164,25 +167,36 @@ class Twig_Compiler implements Twig_CompilerInterface
      */
     public function repr($value)
     {
-        if (is_int($value) || is_float($value)) {
-            if (false !== $locale = setlocale(LC_NUMERIC, 0)) {
+        if (is_int($value) || is_float($value))
+        {
+            if (false !== $locale = setlocale(LC_NUMERIC, 0))
+            {
                 setlocale(LC_NUMERIC, 'C');
             }
 
             $this->raw($value);
 
-            if (false !== $locale) {
+            if (false !== $locale)
+            {
                 setlocale(LC_NUMERIC, $locale);
             }
-        } elseif (null === $value) {
+        }
+        elseif (null === $value)
+        {
             $this->raw('null');
-        } elseif (is_bool($value)) {
+        }
+        elseif (is_bool($value))
+        {
             $this->raw($value ? 'true' : 'false');
-        } elseif (is_array($value)) {
+        }
+        elseif (is_array($value))
+        {
             $this->raw('array(');
             $i = 0;
-            foreach ($value as $key => $value) {
-                if ($i++) {
+            foreach ($value as $key => $value)
+            {
+                if ($i++)
+                {
                     $this->raw(', ');
                 }
                 $this->repr($key);
@@ -190,7 +204,9 @@ class Twig_Compiler implements Twig_CompilerInterface
                 $this->repr($value);
             }
             $this->raw(')');
-        } else {
+        }
+        else
+        {
             $this->string($value);
         }
 
@@ -206,16 +222,20 @@ class Twig_Compiler implements Twig_CompilerInterface
      */
     public function addDebugInfo(Twig_NodeInterface $node)
     {
-        if ($node->getLine() != $this->lastLine) {
+        if ($node->getLine() != $this->lastLine)
+        {
             $this->write("// line {$node->getLine()}\n");
 
             // when mbstring.func_overload is set to 2
             // mb_substr_count() replaces substr_count()
             // but they have different signatures!
-            if (((int) ini_get('mbstring.func_overload')) & 2) {
+            if (((int)ini_get('mbstring.func_overload')) & 2)
+            {
                 // this is much slower than the "right" version
                 $this->sourceLine += mb_substr_count(mb_substr($this->source, $this->sourceOffset), "\n");
-            } else {
+            }
+            else
+            {
                 $this->sourceLine += substr_count($this->source, "\n", $this->sourceOffset);
             }
             $this->sourceOffset = strlen($this->source);
@@ -256,7 +276,8 @@ class Twig_Compiler implements Twig_CompilerInterface
     public function outdent($step = 1)
     {
         // can't outdent by more steps than the current indentation level
-        if ($this->indentation < $step) {
+        if ($this->indentation < $step)
+        {
             throw new LogicException('Unable to call outdent() as the indentation would become negative');
         }
 

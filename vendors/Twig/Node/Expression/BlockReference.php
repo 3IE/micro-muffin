@@ -29,23 +29,25 @@ class Twig_Node_Expression_BlockReference extends Twig_Node_Expression
      */
     public function compile(Twig_Compiler $compiler)
     {
-        if ($this->getAttribute('as_string')) {
+        if ($this->getAttribute('as_string'))
+        {
             $compiler->raw('(string) ');
         }
 
-        if ($this->getAttribute('output')) {
+        if ($this->getAttribute('output'))
+        {
             $compiler
                 ->addDebugInfo($this)
                 ->write("\$this->displayBlock(")
                 ->subcompile($this->getNode('name'))
-                ->raw(", \$context, \$blocks);\n")
-            ;
-        } else {
+                ->raw(", \$context, \$blocks);\n");
+        }
+        else
+        {
             $compiler
                 ->raw("\$this->renderBlock(")
                 ->subcompile($this->getNode('name'))
-                ->raw(", \$context, \$blocks)")
-            ;
+                ->raw(", \$context, \$blocks)");
         }
     }
 }

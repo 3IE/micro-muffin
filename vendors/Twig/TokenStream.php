@@ -24,14 +24,14 @@ class Twig_TokenStream
     /**
      * Constructor.
      *
-     * @param array  $tokens   An array of tokens
+     * @param array $tokens   An array of tokens
      * @param string $filename The name of the filename which tokens are associated with
      */
     public function __construct(array $tokens, $filename = null)
     {
-        $this->tokens     = $tokens;
-        $this->current    = 0;
-        $this->filename   = $filename;
+        $this->tokens = $tokens;
+        $this->current = 0;
+        $this->filename = $filename;
     }
 
     /**
@@ -56,7 +56,8 @@ class Twig_TokenStream
      */
     public function next()
     {
-        if (!isset($this->tokens[++$this->current])) {
+        if (!isset($this->tokens[++$this->current]))
+        {
             throw new Twig_Error_Syntax('Unexpected end of template', $this->tokens[$this->current - 1]->getLine(), $this->filename);
         }
 
@@ -71,12 +72,13 @@ class Twig_TokenStream
     public function expect($type, $value = null, $message = null)
     {
         $token = $this->tokens[$this->current];
-        if (!$token->test($type, $value)) {
+        if (!$token->test($type, $value))
+        {
             $line = $token->getLine();
             throw new Twig_Error_Syntax(sprintf('%sUnexpected token "%s" of value "%s" ("%s" expected%s)',
-                $message ? $message.'. ' : '',
-                Twig_Token::typeToEnglish($token->getType(), $line), $token->getValue(),
-                Twig_Token::typeToEnglish($type, $line), $value ? sprintf(' with value "%s"', $value) : ''),
+                    $message ? $message . '. ' : '',
+                    Twig_Token::typeToEnglish($token->getType(), $line), $token->getValue(),
+                    Twig_Token::typeToEnglish($type, $line), $value ? sprintf(' with value "%s"', $value) : ''),
                 $line,
                 $this->filename
             );
@@ -95,7 +97,8 @@ class Twig_TokenStream
      */
     public function look($number = 1)
     {
-        if (!isset($this->tokens[$this->current + $number])) {
+        if (!isset($this->tokens[$this->current + $number]))
+        {
             throw new Twig_Error_Syntax('Unexpected end of template', $this->tokens[$this->current + $number - 1]->getLine(), $this->filename);
         }
 

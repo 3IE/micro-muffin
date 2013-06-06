@@ -22,8 +22,7 @@ class Twig_Node_Expression_Binary_In extends Twig_Node_Expression_Binary
             ->subcompile($this->getNode('left'))
             ->raw(', ')
             ->subcompile($this->getNode('right'))
-            ->raw(')')
-        ;
+            ->raw(')');
     }
 
     public function operator(Twig_Compiler $compiler)

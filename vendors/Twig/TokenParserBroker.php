@@ -30,14 +30,18 @@ class Twig_TokenParserBroker implements Twig_TokenParserBrokerInterface
      */
     public function __construct($parsers = array(), $brokers = array())
     {
-        foreach ($parsers as $parser) {
-            if (!$parser instanceof Twig_TokenParserInterface) {
+        foreach ($parsers as $parser)
+        {
+            if (!$parser instanceof Twig_TokenParserInterface)
+            {
                 throw new LogicException('$parsers must a an array of Twig_TokenParserInterface');
             }
             $this->parsers[$parser->getTag()] = $parser;
         }
-        foreach ($brokers as $broker) {
-            if (!$broker instanceof Twig_TokenParserBrokerInterface) {
+        foreach ($brokers as $broker)
+        {
+            if (!$broker instanceof Twig_TokenParserBrokerInterface)
+            {
                 throw new LogicException('$brokers must a an array of Twig_TokenParserBrokerInterface');
             }
             $this->brokers[] = $broker;
@@ -62,7 +66,8 @@ class Twig_TokenParserBroker implements Twig_TokenParserBrokerInterface
     public function removeTokenParser(Twig_TokenParserInterface $parser)
     {
         $name = $parser->getTag();
-        if (isset($this->parsers[$name]) && $parser === $this->parsers[$name]) {
+        if (isset($this->parsers[$name]) && $parser === $this->parsers[$name])
+        {
             unset($this->parsers[$name]);
         }
     }
@@ -84,7 +89,8 @@ class Twig_TokenParserBroker implements Twig_TokenParserBrokerInterface
      */
     public function removeTokenParserBroker(Twig_TokenParserBroker $broker)
     {
-        if (false !== $pos = array_search($broker, $this->brokers)) {
+        if (false !== $pos = array_search($broker, $this->brokers))
+        {
             unset($this->brokers[$pos]);
         }
     }
@@ -100,13 +106,16 @@ class Twig_TokenParserBroker implements Twig_TokenParserBrokerInterface
      */
     public function getTokenParser($tag)
     {
-        if (isset($this->parsers[$tag])) {
+        if (isset($this->parsers[$tag]))
+        {
             return $this->parsers[$tag];
         }
         $broker = end($this->brokers);
-        while (false !== $broker) {
+        while (false !== $broker)
+        {
             $parser = $broker->getTokenParser($tag);
-            if (null !== $parser) {
+            if (null !== $parser)
+            {
                 return $parser;
             }
             $broker = prev($this->brokers);
@@ -128,10 +137,12 @@ class Twig_TokenParserBroker implements Twig_TokenParserBrokerInterface
     public function setParser(Twig_ParserInterface $parser)
     {
         $this->parser = $parser;
-        foreach ($this->parsers as $tokenParser) {
+        foreach ($this->parsers as $tokenParser)
+        {
             $tokenParser->setParser($parser);
         }
-        foreach ($this->brokers as $broker) {
+        foreach ($this->brokers as $broker)
+        {
             $broker->setParser($parser);
         }
     }

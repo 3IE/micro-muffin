@@ -42,7 +42,8 @@ class Twig_TokenParser_Include extends Twig_TokenParser
         $stream = $this->parser->getStream();
 
         $ignoreMissing = false;
-        if ($stream->test(Twig_Token::NAME_TYPE, 'ignore')) {
+        if ($stream->test(Twig_Token::NAME_TYPE, 'ignore'))
+        {
             $stream->next();
             $stream->expect(Twig_Token::NAME_TYPE, 'missing');
 
@@ -50,14 +51,16 @@ class Twig_TokenParser_Include extends Twig_TokenParser
         }
 
         $variables = null;
-        if ($stream->test(Twig_Token::NAME_TYPE, 'with')) {
+        if ($stream->test(Twig_Token::NAME_TYPE, 'with'))
+        {
             $stream->next();
 
             $variables = $this->parser->getExpressionParser()->parseExpression();
         }
 
         $only = false;
-        if ($stream->test(Twig_Token::NAME_TYPE, 'only')) {
+        if ($stream->test(Twig_Token::NAME_TYPE, 'only'))
+        {
             $stream->next();
 
             $only = true;

@@ -43,8 +43,10 @@ class Twig_TokenParser_If extends Twig_TokenParser
         $else = null;
 
         $end = false;
-        while (!$end) {
-            switch ($stream->next()->getValue()) {
+        while (!$end)
+        {
+            switch ($stream->next()->getValue())
+            {
                 case 'else':
                     $stream->expect(Twig_Token::BLOCK_END_TYPE);
                     $else = $this->parser->subparse(array($this, 'decideIfEnd'));
