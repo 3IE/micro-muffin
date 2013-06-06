@@ -119,6 +119,8 @@ class Router
                                     $result = $filter_ref->exec();
                                     if ($result != null)
                                     {
+                                        if ($filter_ref->name == "login")
+                                            Controller::setIntented("/".$url);
                                         Controller::redirect($result);
                                     }
                                 }

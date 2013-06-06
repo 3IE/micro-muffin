@@ -46,7 +46,6 @@ class IndexController extends \Lib\Controller
         $user = User::find(2);
         $user->save();
 
-
         $this->set("mavar", "cocorico");
     }
 }
