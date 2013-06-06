@@ -11,7 +11,10 @@ namespace Lib;
 abstract class Model
 {
     /** @var string|null */
-    protected static $find_stored_procedure = null;
+    protected static $procstock_find = null;
+    /** @var string|null */
+    protected static $procstock_all = null;
+    /** @var string|null */
     protected static $table_name = null;
 
     /** @var  int */
@@ -20,7 +23,7 @@ abstract class Model
     /**
      * @param int $id
      */
-    public function setId($id)
+    private function setId($id)
     {
         $this->_id = $id;
     }
@@ -34,8 +37,8 @@ abstract class Model
     }
 
     /**
-     * @param \Lib\Model $object $object
-     * @param object $data
+     * @param Model $object
+     * @param $data
      */
     private static function hydrate(Model &$object, $data)
     {
@@ -57,7 +60,7 @@ abstract class Model
         $class = get_called_class();
         $classLowered = strtolower($class);
 
-        $stored_procedure = self::$find_stored_procedure != null ? self::$find_stored_procedure : 'get' . $classLowered . 'fromid';
+        $stored_procedure = self::$procstock_find != null ? self::$procstock_find : 'get' . $classLowered . 'fromid';
 
         $pdo = PDOS::getInstance();
         $req = $pdo->prepare('SELECT ' . $stored_procedure . '(:id)');
@@ -72,6 +75,10 @@ abstract class Model
         return $output_object;
     }
 
+    /**
+     * @param \ReflectionClass $r
+     * @return array
+     */
     private function getAttributes(\ReflectionClass $r)
     {
         $attributes = array();
@@ -94,6 +101,9 @@ abstract class Model
         return $attributes;
     }
 
+    /**
+     * @return string JSON object
+     */
     public function toJson()
     {
         $reflection = new \ReflectionClass($this);
@@ -177,5 +187,30 @@ abstract class Model
             $query->bindValue(':' . $k, $v);
         }
         $query->execute();
+    }
+
+    /**
+     * @return Model[]
+     */
+    public static function all()
+    {
+        $class = strtolower(get_called_class());
+        $proc = self::$procstock_all != null ? self::$procstock_all : $class . 's';
+        $pdo = PDOS::getInstance();
+
+        $query = $pdo->prepare('SELECT getall' . $proc . '()');
+        $query->execute();
+
+        $datas = $query->fetchAll(\PDO::FETCH_COLUMN);
+
+        $outputs = array();
+        foreach ($datas as $d)
+        {
+            $json_object = json_decode($d);
+            $object = new $class();
+            self::hydrate($object, $json_object);
+            $outputs[] = $object;
+        }
+        return $outputs;
     }
 }

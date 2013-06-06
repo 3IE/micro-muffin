@@ -22,10 +22,7 @@ class IndexController extends \Lib\Controller
 
     public function index($params = array())
     {
-        $user = new User();
-        $user->setLogin("mathieu");
-        $user->save();
-
+        var_dump(User::all());
 
         $this->set("mavar", "cocorico");
         $this->render = "false";
