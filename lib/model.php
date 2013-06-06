@@ -213,4 +213,16 @@ abstract class Model
         }
         return $outputs;
     }
+
+    public static function delete($id)
+    {
+        $class = strtolower(get_called_class());
+        $table = self::$table_name != null ? self::$table_name : $class . 's';
+
+        $pdo = PDOS::getInstance();
+
+        $query = $pdo->prepare('DELETE FROM ' . $table . ' WHERE id = :id');
+        $query->bindParam(':id', $id, \PDO::PARAM_INT);
+        $query->execute();
+    }
 }

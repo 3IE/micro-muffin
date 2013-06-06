@@ -7,7 +7,6 @@
 
 class User extends \Lib\Model
 {
-
     /** @var  string */
     private $_login;
     /** @var  string */
