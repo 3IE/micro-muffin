@@ -10,8 +10,10 @@ namespace Lib;
 
 class Router
 {
+    /** @var array */
     private static $routes = array();
 
+    /** @var Filter[] */
     private static $filters = array();
 
     /**
@@ -25,7 +27,8 @@ class Router
         {
             $e = new \Error("Routing error", "A route must contain a url, a controller and an action");
             $e->display();
-        } else
+        }
+        else
         {
             $filters = array();
             if (array_key_exists("filters", $content))
@@ -62,7 +65,8 @@ class Router
             {
                 $part = ltrim($part, "#");
                 $res_url[] = array('name' => $part, 'val' => "[a-zA-Z0-9\32-\151]+");
-            } else
+            }
+            else
             {
                 $res_url[] = $part;
             }
@@ -78,7 +82,7 @@ class Router
     public static function get($url)
     {
         $params = array();
-        $url_array = explode("/", $url);        
+        $url_array = explode("/", $url);
         while (count($url_array) > 0 && $url_array[0] == "")
             array_shift($url_array);
 
@@ -90,17 +94,19 @@ class Router
             if (count($route_url) == count($url_array))
             {
                 if ($route_url == array() || (array_key_exists(0, $route_url) && $route_url[0] == $url_array[0] &&
-                    (!array_key_exists(1, $route_url) || $route_url[1] == $url_array[1])
-                ))
+                        (!array_key_exists(1, $route_url) || $route_url[1] == $url_array[1])
+                    )
+                )
                 {
                     $match = true;
                     //Matching parameters
                     for ($i = 2; array_key_exists($i, $route_url); $i++)
                     {
-                        if (preg_match("#".$route_url[$i]['val']."#", $url_array[$i]))
+                        if (preg_match("#" . $route_url[$i]['val'] . "#", $url_array[$i]))
                         {
                             $params[$route_url[$i]['name']] = $url_array[$i];
-                        } else
+                        }
+                        else
                         {
                             $match = false;
                             break;
@@ -120,7 +126,7 @@ class Router
                                     if ($result != null)
                                     {
                                         if ($filter_ref->name == "login")
-                                            Controller::setIntented("/".$url);
+                                            Controller::setIntented("/" . $url);
                                         Controller::redirect($result);
                                     }
                                 }
@@ -145,7 +151,7 @@ class Router
      * Add a filter to the router
      */
     public static function filter($name, $callback)
-    {        
+    {
         $filter = new Filter($name, $callback);
         self::$filters[] = $filter;
     }
