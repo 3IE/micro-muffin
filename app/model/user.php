@@ -7,36 +7,18 @@
 
 class User extends \Lib\Model
 {
-    /** @var  int */
-    private $id;
+
     /** @var  string */
-    private $login;
+    private $_login;
     /** @var  string */
-    private $password;
-
-
-    /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
+    private $_password;
 
     /**
      * @param string $login
      */
     public function setLogin($login)
     {
-        $this->login = $login;
+        $this->_login = $login;
     }
 
     /**
@@ -44,7 +26,7 @@ class User extends \Lib\Model
      */
     public function getLogin()
     {
-        return $this->login;
+        return $this->_login;
     }
 
     /**
@@ -52,7 +34,7 @@ class User extends \Lib\Model
      */
     public function setPassword($password)
     {
-        $this->password = $password;
+        $this->_password = $password;
     }
 
     /**
@@ -60,6 +42,6 @@ class User extends \Lib\Model
      */
     public function getPassword()
     {
-        return $this->password;
+        return $this->_password;
     }
 }
