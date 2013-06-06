@@ -41,4 +41,13 @@ class Controller
   {
     return $this->render;
   }
+
+  /**
+   * @return void
+   */
+  public function redirect($url)
+  {
+      header("Location: ".$url);
+      die();
+  }
 }
