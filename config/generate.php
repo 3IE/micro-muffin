@@ -1,10 +1,8 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
  * User: Mathieu
  * Date: 08/06/13
  * Time: 15:55
- * To change this template use File | Settings | File Templates.
  */
 
 require_once 'config.php';
@@ -31,7 +29,7 @@ function writeField($field)
 {
   $fieldCapitalize    = $field;
   $fieldCapitalize[0] = strtoupper($fieldCapitalize[0]);
-  $str                = TAB . 'private $_' . $field . ";\n\n";
+  $str                = TAB . 'protected $_' . $field . ";\n\n";
 
   //Writing getter
   $str .= TAB . "public function get" . $fieldCapitalize . "()\n" . TAB . "{\n";
@@ -64,6 +62,27 @@ function createT_Model($name, $fields)
 
     fwrite($file, "}\n");
     fclose($file);
+  }
+}
+
+function createModel($name)
+{
+  $name         = strtolower($name);
+  $className    = $name;
+  $className[0] = strtoupper($className[0]);
+
+  if (!file_exists(THIS_MODEL_DIR . $name . '.php'))
+  {
+    $file = fopen(THIS_MODEL_DIR . $name . '.php', 'w');
+
+    if ($file)
+    {
+      fwrite($file, "<?php\n\n");
+      fwrite($file, 'class ' . $className . ' extends T_' . $className . "\n{\n");
+      fwrite($file, "\n}\n");
+
+      fclose($file);
+    }
   }
 }
 
@@ -102,12 +121,23 @@ foreach ($fields as $field)
 unset($fields);
 unset($field);
 
+writeLine(count($tables) . ' table' . (count($tables) > 1 ? 's' : '') . ' found');
+writeLine("Generating models...");
+
 //Foreach table, generates both T_Model and Model
 foreach ($tables as $table)
 {
   $fields = $tables_fields[$table];
 
   //Retrieving the 's' add the end of the table name
-  $table = substr($table, 0, -1);
+  $table        = substr($table, 0, -1);
+  $className    = $table;
+  $className[0] = strtoupper($className[0]);
   createT_Model($table, $fields);
+  writeLine(' T_' . $className . ' model written');
+  createModel($table);
+  writeLine(' ' . $className . ' model written');
 }
+
+writeLine("Done !");
+writeLine("Generation finished ! Enjoy ;)");
