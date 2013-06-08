@@ -49,9 +49,10 @@ abstract class Model
     $attributes       = array();
     $class            = $r->getShortName();
     $attributes['id'] = $this->_id;
+
     foreach ($r->getProperties() as $att)
     {
-      if ($att->class == $class)
+      if ($att->class == 'T_' . $class)
       {
         $name = $att->name;
         if ($name[0] == "_")

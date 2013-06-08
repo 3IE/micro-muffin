@@ -42,12 +42,10 @@ class Writable extends Readable
 
     $pdo = PDOS::getInstance();
 
-    $pdo->beginTransaction();
     if ($this->_id == 0)
       $this->add($pdo, $table, $fields, $values, $attributes);
     else
       $this->update($pdo, $table, $attributes);
-    $pdo->commit();
   }
 
   /**
@@ -57,10 +55,11 @@ class Writable extends Readable
    * @param string $values
    * @param array $attributes
    */
-  private function add(EPO &$pdo, $table, $fields, $values, Array $attributes)
+  private function add(EPO $pdo, $table, $fields, $values, Array $attributes)
   {
     $query = 'INSERT INTO ' . $table . ' ' . $fields . ' VALUES ' . $values;
 
+    $pdo->beginTransaction();
     $query = $pdo->prepare($query);
     foreach ($attributes as $k => $v)
     {
@@ -69,6 +68,7 @@ class Writable extends Readable
     }
     $query->execute();
     $this->setId($pdo->lastInsertId());
+    $pdo->commit();
   }
 
   /**
@@ -76,7 +76,7 @@ class Writable extends Readable
    * @param $table
    * @param array $attributes
    */
-  private function update(EPO &$pdo, $table, Array $attributes)
+  private function update(EPO $pdo, $table, Array $attributes)
   {
     $sql = 'UPDATE ' . $table . ' SET ';
 
@@ -89,11 +89,13 @@ class Writable extends Readable
     $set = substr($set, 0, -2);
     $sql .= $set . ' WHERE id = :id';
 
+    $pdo->beginTransaction();
     $query = $pdo->prepare($sql);
     foreach ($attributes as $k => $v)
     {
       $query->bindValue(':' . $k, $v);
     }
     $query->execute();
+    $pdo->commit();
   }
 }

@@ -22,11 +22,8 @@ class IndexController extends \Lib\Controller
 
   public function index($params = array())
   {
-    $u = new User();
-    $u->setLogin("babar");
-    $u->setPassword("éléphant bleu");
-    $u->save();
-    var_dump(User::find(1));
+    /** @var User $u */
+    $u = User::find(1);
     var_dump(User::all());
 
     $this->set("mavar", "cocorico");

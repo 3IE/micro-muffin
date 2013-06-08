@@ -37,6 +37,7 @@ class Readable extends Model
     $req->execute();
 
     $json_object = json_decode($req->fetch(\PDO::FETCH_COLUMN));
+
     if (!is_null($json_object))
     {
       $output_object = new $class();
