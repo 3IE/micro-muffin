@@ -9,22 +9,23 @@
 
 class IndexController extends \Lib\Controller
 {
-    public function toArray($object)
+  public function toArray($object)
+  {
+    $array = array();
+    var_dump(get_object_vars($object));
+    foreach (get_class_vars(get_class($object)) as $k => $v)
     {
-        $array = array();
-        var_dump(get_object_vars($object));
-        foreach (get_class_vars(get_class($object)) as $k => $v)
-        {
-            $array[$k] = $v;
-        }
-        return $array;
+      $array[$k] = $v;
     }
+    return $array;
+  }
 
-    public function index($params = array())
-    {
-        var_dump(User::all());
+  public function index($params = array())
+  {
+    var_dump(User::find(1));
+    var_dump(User::all());
 
-        $this->set("mavar", "cocorico");
-        $this->render = "false";
-    }
+    $this->set("mavar", "cocorico");
+    $this->render = "false";
+  }
 }
