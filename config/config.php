@@ -18,14 +18,8 @@ define('BASE_DIR', '');
 define('CONTROLLER_DIR', BASE_DIR . 'app/controller/');
 define('VIEW_DIR', BASE_DIR . 'app/view/');
 define('MODEL_DIR', BASE_DIR . 'app/model/');
+define('TMODEL_DIR', BASE_DIR . 'app/t_model/');
 define('CONFIG_DIR', BASE_DIR . 'config/');
 define('VENDORS_DIR', BASE_DIR . 'vendors/');
 define('LIB_DIR', BASE_DIR . 'lib/');
-
-//Autoload
-set_include_path(get_include_path() . PATH_SEPARATOR . CONTROLLER_DIR .
-PATH_SEPARATOR . MODEL_DIR .
-PATH_SEPARATOR . CONFIG_DIR .
-PATH_SEPARATOR . LIB_DIR);
-spl_autoload_extensions('.php');
-spl_autoload_register();
+define('LIBMODEL_DIR', BASE_DIR . 'lib/models/');

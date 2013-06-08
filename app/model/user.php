@@ -5,42 +5,7 @@
  * Time: 16:03
  */
 
-class User extends \Lib\Model
+class User extends T_User
 {
-    /** @var  string */
-    private $_login;
-    /** @var  string */
-    private $_password;
 
-    /**
-     * @param string $login
-     */
-    public function setLogin($login)
-    {
-        $this->_login = $login;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLogin()
-    {
-        return $this->_login;
-    }
-
-    /**
-     * @param string $password
-     */
-    public function setPassword($password)
-    {
-        $this->_password = $password;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPassword()
-    {
-        return $this->_password;
-    }
 }

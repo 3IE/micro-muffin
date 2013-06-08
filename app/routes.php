@@ -7,10 +7,11 @@
 
 $router = new \Lib\Router();
 
+/*
 $router::filter("login", function () {
 	if (2 < 4)
 		return "/articles";
 });
+*/
 
-$router::add(array("url" => "/", "controller" => "index", "action" => "index", "filters" => "login"));
-$router::add(array("url" => "/articles", "controller" => "index", "action" => "index"));
+$router::add(array("url" => "/", "controller" => "index", "action" => "index"));
