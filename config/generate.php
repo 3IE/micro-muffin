@@ -107,6 +107,36 @@ function writeJoin($field, $foreignTable, $foreignField)
   return $str;
 }
 
+/**
+ * @param string $className
+ * @return string
+ */
+function writeOverrideBaseFunctions($className)
+{
+  $str = '';
+
+  //find
+  $str .= TAB . "/**\n";
+  $str .= TAB . " * @param int \$id\n";
+  $str .= TAB . " * @return ".$className."\n";
+  $str .= TAB . " */\n";
+  $str .= TAB . 'public static function find($id)'."\n";
+  $str .= TAB . "{\n";
+  $str .= TAB . TAB . 'return parent::find($id);'."\n";
+  $str .= TAB . "}\n";
+
+  //all
+  $str .= TAB . "/**\n";
+  $str .= TAB . " * @return ".$className."[]\n";
+  $str .= TAB . " */\n";
+  $str .= TAB . 'public static function all()'."\n";
+  $str .= TAB . "{\n";
+  $str .= TAB . TAB . 'return parent::all();'."\n";
+  $str .= TAB . "}\n";
+
+  return $str;
+}
+
 function createT_Model($tableName, $fields, Array $constraints)
 {
   $tableName    = strtolower($tableName);
@@ -131,6 +161,8 @@ function createT_Model($tableName, $fields, Array $constraints)
       else
         fwrite($file, writeField($field));
     }
+
+    fwrite($file, writeOverrideBaseFunctions(substr($className, 2)));
 
     fwrite($file, "}\n");
     fclose($file);
