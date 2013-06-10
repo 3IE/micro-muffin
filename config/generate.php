@@ -50,13 +50,11 @@ function createT_Model($name, $fields)
 
   $file = fopen(THIS_T_MODEL_DIR . 't_' . $name . '.php', 'w');
 
-  if ($file)
-  {
+  if ($file) {
     fwrite($file, DISCLAIMER);
     fwrite($file, 'class ' . $className . ' extends \Lib\Models\Deletable' . "\n{\n");
 
-    foreach ($fields as $field)
-    {
+    foreach ($fields as $field) {
       fwrite($file, writeField($field));
     }
 
@@ -71,12 +69,10 @@ function createModel($name)
   $className    = $name;
   $className[0] = strtoupper($className[0]);
 
-  if (!file_exists(THIS_MODEL_DIR . $name . '.php'))
-  {
+  if (!file_exists(THIS_MODEL_DIR . $name . '.php')) {
     $file = fopen(THIS_MODEL_DIR . $name . '.php', 'w');
 
-    if ($file)
-    {
+    if ($file) {
       fwrite($file, "<?php\n\n");
       fwrite($file, 'class ' . $className . ' extends T_' . $className . "\n{\n");
       fwrite($file, "\n}\n");
@@ -86,14 +82,52 @@ function createModel($name)
   }
 }
 
+function writeAllProcedure(\Lib\EPO &$pdo, $tableName)
+{
+  $procedureName = 'getall' . $tableName;
+
+  $pdo->beginTransaction();
+
+  $pdo->exec("CREATE OR REPLACE FUNCTION " . $procedureName . "()
+  RETURNS SETOF JSON AS
+  'SELECT row_to_json(" . $tableName . ") FROM " . $tableName . "'
+  LANGUAGE SQL VOLATILE
+  COST 100
+  ROWS 1000;
+  ALTER FUNCTION " . $procedureName . "()
+  OWNER TO \"" . DBUSER . "\";");
+
+  $pdo->commit();
+}
+
+function writeFindProcedure(\Lib\EPO &$pdo, $tableName)
+{
+  $procedureName = 'get' . substr($tableName, 0, -1) . 'fromid';
+  $parameter = substr($tableName, 0, -1)."_id";
+  $alias = $tableName[0];
+
+  $pdo->beginTransaction();
+
+  $pdo->exec("CREATE OR REPLACE FUNCTION ".$procedureName."(".$parameter." numeric)
+  RETURNS json AS
+  'SELECT row_to_json(".$alias.") FROM ".$tableName." ".$alias." WHERE ".$alias.".id = ".$parameter."'
+  LANGUAGE sql VOLATILE
+  COST 100;
+  ALTER FUNCTION ".$procedureName."(numeric)
+  OWNER TO \"".DBUSER."\";");
+
+  $pdo->commit();
+}
+
+/**
+ * SCRIPT BEGINS HERE
+ */
+
 writeLine("Connecting to " . DBNAME . " on " . DBHOST . "...");
 $pdo = null;
-try
-{
+try {
   $pdo = \Lib\PDOS::getInstance();
-}
-catch (Exception $e)
-{
+} catch (Exception $e) {
   writeLine("Error ! Connection to database failed.");
   exit(1);
 }
@@ -110,8 +144,7 @@ $tables_fields = array();
 $tables        = array();
 $fields        = $query->fetchAll();
 
-foreach ($fields as $field)
-{
+foreach ($fields as $field) {
   if (!in_array($field['table_name'], $tables))
     $tables[] = $field['table_name'];
   if ($field['column_name'] != 'id')
@@ -125,19 +158,34 @@ writeLine(count($tables) . ' table' . (count($tables) > 1 ? 's' : '') . ' found'
 writeLine("Generating models...");
 
 //Foreach table, generates both T_Model and Model
-foreach ($tables as $table)
-{
-  $fields = $tables_fields[$table];
+foreach ($tables as $table) {
+  $fields            = $tables_fields[$table];
+  $originalTableName = $table;
 
-  //Retrieving the 's' add the end of the table name
-  $table        = substr($table, 0, -1);
+  //Retrieving the 's' add the end of the table name, if exists
+  if ($table[strlen($table) - 1] == 's')
+    $table = substr($table, 0, -1);
+
   $className    = $table;
   $className[0] = strtoupper($className[0]);
+
   createT_Model($table, $fields);
   writeLine(' T_' . $className . ' model written');
+
   createModel($table);
   writeLine(' ' . $className . ' model written');
+
+  writeAllProcedure($pdo, $originalTableName);
+  writeLine(' getall' . $originalTableName . '() function written in database');
+
+  writeFindProcedure($pdo, $originalTableName);
+  writeLine(' get' . substr($originalTableName, 0, -1) . 'fromid() function written in database');
+  writeLine("");
 }
 
 writeLine("Done !");
 writeLine("Generation finished ! Enjoy ;)");
+
+/**
+ * SCRIPT ENDS HERE
+ */
