@@ -25,37 +25,111 @@ function writeLine($str)
   echo $str . "\n";
 }
 
-function writeField($field)
+/**
+ * @param array $constraints
+ * @param string $column
+ * @param string $table
+ * @return array|null
+ */
+function getForeignKey(Array $constraints, $column, $table)
+{
+  if (array_key_exists($table, $constraints))
+  {
+    $tableConstraints = $constraints[$table];
+    foreach ($tableConstraints as $constraint)
+    {
+      if ($column == $constraint['column_name'])
+        return $constraint;
+    }
+  }
+  return null;
+}
+
+/**
+ * @param string $table
+ * @return string
+ */
+function removeSFromTableName($table)
+{
+  if ($table[strlen($table) - 1] == 's')
+    $table = substr($table, 0, -1);
+  return $table;
+}
+
+/**
+ * @param string $field
+ * @param bool $visible
+ * @return string
+ */
+function writeField($field, $visible = true)
 {
   $fieldCapitalize    = $field;
   $fieldCapitalize[0] = strtoupper($fieldCapitalize[0]);
-  $str                = TAB . 'protected $_' . $field . ";\n\n";
+  $str                = TAB . ($visible ? 'protected' : 'private') . ' $_' . $field . ";\n\n";
 
   //Writing getter
-  $str .= TAB . "public function get" . $fieldCapitalize . "()\n" . TAB . "{\n";
+  $str .= TAB . ($visible ? "public" : "private") . " function get" . $fieldCapitalize . "()\n" . TAB . "{\n";
   $str .= TAB . TAB . 'return $this->_' . $field . ";\n" . TAB . "}\n\n";
 
   //Writting setter
-  $str .= TAB . "public function set" . $fieldCapitalize . '($' . $field . ")\n" . TAB . "{\n";
+  $str .= TAB . ($visible ? "public" : "private") . " function set" . $fieldCapitalize . '($' . $field . ")\n" . TAB . "{\n";
   $str .= TAB . TAB . '$this->_' . $field . ' = $' . $field . ";\n" . TAB . "}\n\n";
 
   return $str;
 }
 
-function createT_Model($name, $fields)
+/**
+ * @param string $field
+ * @param string $foreignTable
+ * @param string $foreignField
+ * @return string
+ */
+function writeJoin($field, $foreignTable, $foreignField)
 {
-  $name         = strtolower($name);
-  $className    = "T_" . $name;
+  $str          = '';
+  $className    = removeSFromTableName($foreignTable);
+  $className[0] = strtoupper($className);
+  $var          = '$' . $className;
+  $var[1]       = strtoupper($var[1]);
+
+  //Getter
+  $str .= TAB . "/** @return ".$className." */\n";
+  $str .= TAB . "public function get" . $className . "()\n" . TAB . "{\n";
+  $str .= TAB . TAB . $var . ' = ' . $className . '::find($this->_' . $field . ');' . "\n";
+  $str .= TAB . TAB . 'return ' . $var . ';' . "\n";
+  $str .= TAB . "}\n";
+
+  //Setter
+  $str .= TAB . "public function set" . $className . "(" . $className . " " . $var . ")\n" . TAB . "{\n";
+  $str .= TAB . TAB . '$this->_' . $field . ' = ' . $var . ";\n";
+  $str .= TAB . "}\n";
+
+  return $str;
+}
+
+function createT_Model($tableName, $fields, Array $constraints)
+{
+  $tableName    = strtolower($tableName);
+  $class        = removeSFromTableName($tableName);
+  $className    = "T_" . $class;
   $className[2] = strtoupper($className[2]);
 
-  $file = fopen(THIS_T_MODEL_DIR . 't_' . $name . '.php', 'w');
+  $file = fopen(THIS_T_MODEL_DIR . 't_' . $class . '.php', 'w');
 
-  if ($file) {
+  if ($file)
+  {
     fwrite($file, DISCLAIMER);
     fwrite($file, 'class ' . $className . ' extends \Lib\Models\Deletable' . "\n{\n");
 
-    foreach ($fields as $field) {
-      fwrite($file, writeField($field));
+    foreach ($fields as $field)
+    {
+      if ($constrait = getForeignKey($constraints, $field, $tableName))
+      {
+        fwrite($file, writeField($field, false));
+        fwrite($file, writeJoin($field, $constrait['foreign_table_name'], $constrait['foreign_column_name']));
+      }
+      else
+        fwrite($file, writeField($field));
     }
 
     fwrite($file, "}\n");
@@ -69,10 +143,12 @@ function createModel($name)
   $className    = $name;
   $className[0] = strtoupper($className[0]);
 
-  if (!file_exists(THIS_MODEL_DIR . $name . '.php')) {
+  if (!file_exists(THIS_MODEL_DIR . $name . '.php'))
+  {
     $file = fopen(THIS_MODEL_DIR . $name . '.php', 'w');
 
-    if ($file) {
+    if ($file)
+    {
       fwrite($file, "<?php\n\n");
       fwrite($file, 'class ' . $className . ' extends T_' . $className . "\n{\n");
       fwrite($file, "\n}\n");
@@ -103,18 +179,18 @@ function writeAllProcedure(\Lib\EPO &$pdo, $tableName)
 function writeFindProcedure(\Lib\EPO &$pdo, $tableName)
 {
   $procedureName = 'get' . substr($tableName, 0, -1) . 'fromid';
-  $parameter = substr($tableName, 0, -1)."_id";
-  $alias = $tableName[0];
+  $parameter     = substr($tableName, 0, -1) . "_id";
+  $alias         = $tableName[0];
 
   $pdo->beginTransaction();
 
-  $pdo->exec("CREATE OR REPLACE FUNCTION ".$procedureName."(".$parameter." numeric)
+  $pdo->exec("CREATE OR REPLACE FUNCTION " . $procedureName . "(" . $parameter . " numeric)
   RETURNS json AS
-  'SELECT row_to_json(".$alias.") FROM ".$tableName." ".$alias." WHERE ".$alias.".id = ".$parameter."'
+  'SELECT row_to_json(" . $alias . ") FROM " . $tableName . " " . $alias . " WHERE " . $alias . ".id = " . $parameter . "'
   LANGUAGE sql VOLATILE
   COST 100;
-  ALTER FUNCTION ".$procedureName."(numeric)
-  OWNER TO \"".DBUSER."\";");
+  ALTER FUNCTION " . $procedureName . "(numeric)
+  OWNER TO \"" . DBUSER . "\";");
 
   $pdo->commit();
 }
@@ -125,15 +201,37 @@ function writeFindProcedure(\Lib\EPO &$pdo, $tableName)
 
 writeLine("Connecting to " . DBNAME . " on " . DBHOST . "...");
 $pdo = null;
-try {
+try
+{
   $pdo = \Lib\PDOS::getInstance();
-} catch (Exception $e) {
+} catch (Exception $e)
+{
   writeLine("Error ! Connection to database failed.");
   exit(1);
 }
 
 writeLine("Success !");
 writeLine("Retrieving database public schema...");
+
+//Getting constraints
+$query = $pdo->prepare("
+SELECT
+    tc.table_name, kcu.column_name,
+    ccu.table_name AS foreign_table_name,
+    ccu.column_name AS foreign_column_name
+FROM
+    information_schema.table_constraints AS tc
+    JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
+    JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
+WHERE constraint_type = 'FOREIGN KEY';");
+
+$query->execute();
+
+$constraints = array();
+foreach ($query->fetchAll() as $constraint)
+{
+  $constraints[$constraint['table_name']][] = $constraint;
+}
 
 //Getting all fields of all tables from public schema
 $query = $pdo->prepare("SELECT table_name, column_name FROM information_schema.columns
@@ -144,7 +242,8 @@ $tables_fields = array();
 $tables        = array();
 $fields        = $query->fetchAll();
 
-foreach ($fields as $field) {
+foreach ($fields as $field)
+{
   if (!in_array($field['table_name'], $tables))
     $tables[] = $field['table_name'];
   if ($field['column_name'] != 'id')
@@ -158,18 +257,20 @@ writeLine(count($tables) . ' table' . (count($tables) > 1 ? 's' : '') . ' found'
 writeLine("Generating models...");
 
 //Foreach table, generates both T_Model and Model
-foreach ($tables as $table) {
+foreach ($tables as $table)
+{
   $fields            = $tables_fields[$table];
   $originalTableName = $table;
 
   //Retrieving the 's' add the end of the table name, if exists
-  if ($table[strlen($table) - 1] == 's')
-    $table = substr($table, 0, -1);
+  $table = removeSFromTableName($table);
+  //if ($table[strlen($table) - 1] == 's')
+  //  $table = substr($table, 0, -1);
 
   $className    = $table;
   $className[0] = strtoupper($className[0]);
 
-  createT_Model($table, $fields);
+  createT_Model($originalTableName, $fields, $constraints);
   writeLine(' T_' . $className . ' model written');
 
   createModel($table);

@@ -10,7 +10,7 @@
 /* Database configuration */
 define('DBHOST', 'localhost');
 define('DBNAME', 'micro-muffin');
-define('DBUSER', 'micro-muffin');
+define('DBUSER', 'postgres');
 define('DBPASS', 'root');
 define('DISPLAY_SQL_ERROR', true);
 
