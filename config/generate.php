@@ -73,6 +73,7 @@ function writeField($field, $visible = true)
 
   //Writting setter
   $str .= TAB . ($visible ? "public" : "private") . " function set" . $fieldCapitalize . '($' . $field . ")\n" . TAB . "{\n";
+  $str .= TAB . TAB . '$this->_objectEdited();' . "\n";
   $str .= TAB . TAB . '$this->_' . $field . ' = $' . $field . ";\n" . TAB . "}\n\n";
 
   return $str;
@@ -93,7 +94,7 @@ function writeJoin($field, $foreignTable, $foreignField)
   $var[1]       = strtoupper($var[1]);
 
   //Getter
-  $str .= TAB . "/** @return ".$className." */\n";
+  $str .= TAB . "/** @return " . $className . " */\n";
   $str .= TAB . "public function get" . $className . "()\n" . TAB . "{\n";
   $str .= TAB . TAB . $var . ' = ' . $className . '::find($this->_' . $field . ');' . "\n";
   $str .= TAB . TAB . 'return ' . $var . ';' . "\n";
@@ -118,20 +119,20 @@ function writeOverrideBaseFunctions($className)
   //find
   $str .= TAB . "/**\n";
   $str .= TAB . " * @param int \$id\n";
-  $str .= TAB . " * @return ".$className."\n";
+  $str .= TAB . " * @return " . $className . "\n";
   $str .= TAB . " */\n";
-  $str .= TAB . 'public static function find($id)'."\n";
+  $str .= TAB . 'public static function find($id)' . "\n";
   $str .= TAB . "{\n";
-  $str .= TAB . TAB . 'return parent::find($id);'."\n";
+  $str .= TAB . TAB . 'return parent::find($id);' . "\n";
   $str .= TAB . "}\n";
 
   //all
   $str .= TAB . "/**\n";
-  $str .= TAB . " * @return ".$className."[]\n";
+  $str .= TAB . " * @return " . $className . "[]\n";
   $str .= TAB . " */\n";
-  $str .= TAB . 'public static function all()'."\n";
+  $str .= TAB . 'public static function all()' . "\n";
   $str .= TAB . "{\n";
-  $str .= TAB . TAB . 'return parent::all();'."\n";
+  $str .= TAB . TAB . 'return parent::all();' . "\n";
   $str .= TAB . "}\n";
 
   return $str;

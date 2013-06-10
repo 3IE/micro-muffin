@@ -14,8 +14,21 @@ use Lib\PDOS;
 
 class Writable extends Readable
 {
+  /** @var bool  */
+  private  $_modified = true;
+
+  protected function _objectEdited()
+  {
+    $this->_modified = true;
+  }
+
+  private function _objectNotEdited()
+  {
+    $this->_modified = false;
+  }
+
   /**
-   * Add or update the models in database
+   * Add or update the model in database
    *
    * @return void
    */

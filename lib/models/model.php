@@ -55,7 +55,7 @@ abstract class Model
       if ($att->class == 'T_' . $class)
       {
         $name = $att->name;
-        if ($name[0] == "_")
+        if ($name[0] == "_" && $name != '_modified')
         {
           $property = $r->getProperty($name);
           $property->setAccessible(true);
