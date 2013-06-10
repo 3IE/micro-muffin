@@ -101,8 +101,10 @@ function writeJoin($field, $foreignTable, $foreignField)
   $str .= TAB . "}\n";
 
   //Setter
+  $foreignFieldUp = $foreignField;
+  $foreignFieldUp[0] = strtoupper($foreignFieldUp[0]);
   $str .= TAB . "public function set" . $className . "(" . $className . " " . $var . ")\n" . TAB . "{\n";
-  $str .= TAB . TAB . '$this->_' . $field . ' = ' . $var . ";\n";
+  $str .= TAB . TAB . '$this->_' . $field . ' = ' . $var . "->get".$foreignFieldUp."();\n";
   $str .= TAB . "}\n";
 
   return $str;
@@ -151,6 +153,8 @@ function createT_Model($tableName, $fields, Array $constraints)
   {
     fwrite($file, DISCLAIMER);
     fwrite($file, 'class ' . $className . ' extends \Lib\Models\Deletable' . "\n{\n");
+
+    fwrite($file, TAB . "private static \$table_name = '".$tableName."';\n\n");
 
     foreach ($fields as $field)
     {

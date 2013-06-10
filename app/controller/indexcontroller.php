@@ -24,9 +24,17 @@ class IndexController extends \Lib\Controller
   {
     /** @var User $u */
     //var_dump(Article::all());
-    $a = Article::find(1);
-    var_dump($a->getUser());
-    var_dump(new User());
+    //$a = Article::find(1);
+    //var_dump($a->getUser());
+   // var_dump(new User());
+    $user = User::find(1);
+    $article = Article::find(1);
+    $c = new Comment();
+    $c->setArticle($article);
+    $c->setUser($user);
+    $c->setContent("bkwengjwebhfwefjwebhf");
+    var_dump($c);
+    //$c->save();
 
     $this->set("mavar", "cocorico");
     $this->render = "false";
