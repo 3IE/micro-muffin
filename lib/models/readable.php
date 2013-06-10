@@ -22,7 +22,7 @@ class Readable extends Model
    * Find a models with the corresponding id
    *
    * @param int $id
-   * @return null|object
+   * @return null|Model
    */
   public static function find($id)
   {
@@ -57,11 +57,15 @@ class Readable extends Model
    */
   private static function hydrate(Model &$object, $data)
   {
+    $r = new \ReflectionClass($object);
     foreach (get_object_vars($data) as $k => $v)
     {
-      $k[0]   = strtoupper($k[0]);
-      $method = "set" . $k;
-      $object->$method($v);
+      $k[0]       = strtoupper($k[0]);
+      $methodName = "set" . $k;
+      $method     = $r->getMethod($methodName);
+      $method->setAccessible(true);
+      $method->invoke($object, $v);
+      $method->setAccessible(false);
     }
   }
 

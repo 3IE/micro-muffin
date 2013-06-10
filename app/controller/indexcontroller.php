@@ -23,8 +23,9 @@ class IndexController extends \Lib\Controller
   public function index($params = array())
   {
     /** @var User $u */
-    $u = User::find(1);
-    var_dump(User::all());
+    //var_dump(Article::all());
+    $a = Article::find(1);
+    var_dump($a->getUser());
 
     $this->set("mavar", "cocorico");
     $this->render = "false";
