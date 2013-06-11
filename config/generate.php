@@ -221,7 +221,7 @@ function writeAllProcedure(\Lib\EPO &$pdo, $tableName)
   $pdo->beginTransaction();
 
   $pdo->exec("CREATE OR REPLACE FUNCTION " . $procedureName . "()
-  RETURNS SETOF ".$tableName." AS
+  RETURNS SETOF " . $tableName . " AS
   'SELECT * FROM " . $tableName . "'
   LANGUAGE SQL VOLATILE
   COST 100;
@@ -244,13 +244,30 @@ function writeFindProcedure(\Lib\EPO &$pdo, $tableName)
   $pdo->beginTransaction();
 
   $pdo->exec("CREATE OR REPLACE FUNCTION " . $procedureName . "(" . $parameter . " numeric)
-  RETURNS ".$tableName." AS
+  RETURNS " . $tableName . " AS
   'SELECT * FROM " . $tableName . " " . $alias . " WHERE " . $alias . ".id = " . $parameter . "'
   LANGUAGE sql VOLATILE
   COST 100;
   ALTER FUNCTION " . $procedureName . "(numeric)
   OWNER TO \"" . DBUSER . "\";");
 
+  $pdo->commit();
+}
+
+function writeCountProcedure(\Lib\EPO &$pdo, $tableName)
+{
+  $procedureName = 'count' . $tableName;
+
+  $pdo->beginTransaction();
+  $pdo->exec("
+  CREATE OR REPLACE FUNCTION count".$tableName."()
+  RETURNS bigint AS
+  'SELECT COUNT(id) FROM ".$tableName."'
+  LANGUAGE sql VOLATILE
+  COST 100;
+  ALTER FUNCTION count".$tableName."()
+  OWNER TO \"".DBHOST."\";
+  ");
   $pdo->commit();
 }
 
@@ -341,6 +358,10 @@ foreach ($tables as $table)
 
   writeFindProcedure($pdo, $originalTableName);
   writeLine(' get' . substr($originalTableName, 0, -1) . 'fromid() function written in database');
+
+  writeCountProcedure($pdo, $originalTableName);
+  writeLine(' count'.$originalTableName.'() function written in database');
+
   writeLine("");
 }
 

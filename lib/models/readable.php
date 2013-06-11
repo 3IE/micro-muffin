@@ -17,6 +17,8 @@ class Readable extends Model
   protected static $procstock_find = null;
   /** @var string|null */
   protected static $procstock_all = null;
+  /** @var string|null */
+  protected static $procstock_count = null;
 
   /**
    * Find a models with the corresponding id
@@ -99,10 +101,27 @@ class Readable extends Model
     $outputs = array();
     foreach ($datas as $d)
     {
-      $object      = new $class();
+      $object = new $class();
       self::hydrate($object, $d);
       $outputs[] = $object;
     }
     return $outputs;
+  }
+
+  /**
+   * @return int
+   */
+  public static function count()
+  {
+    $class = strtolower(get_called_class());
+    $proc  = self::$procstock_count != null ? self::$procstock_count : 'count' . $class . 's';
+    $pdo   = PDOS::getInstance();
+
+    $query = $pdo->prepare('SELECT * FROM '.$proc.'()');
+    $query->execute();
+
+    $result = $query->fetch();
+
+    return intval($result[$proc]);
   }
 }
