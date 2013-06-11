@@ -14,8 +14,8 @@ use Lib\PDOS;
 
 class Writable extends Readable
 {
-  /** @var bool  */
-  private  $_modified = true;
+  /** @var bool */
+  private $_modified = true;
 
   protected function _objectEdited()
   {
@@ -27,6 +27,11 @@ class Writable extends Readable
     $this->_modified = false;
   }
 
+  public function getModified()
+  {
+    return $this->_modified;
+  }
+
   /**
    * Add or update the model in database
    *
@@ -34,31 +39,39 @@ class Writable extends Readable
    */
   public function save()
   {
-    $reflection = new \ReflectionClass($this);
-    $class      = $reflection->getShortName();
-    $table      = self::$table_name != null ? self::$table_name : strtolower($class) . 's';
-
-    $attributes = $this->getAttributes($reflection);
-
-    $fields = '(';
-    $values = '(';
-    foreach ($attributes as $k => $v)
+    if ($this->_modified)
     {
-      if ($k != 'id')
+      $reflection = new \ReflectionClass($this);
+      $class      = $reflection->getShortName();
+      $table      = self::$table_name != null ? self::$table_name : strtolower($class) . 's';
+
+      $attributes = $this->getAttributes($reflection);
+
+      //Joints model saving
+      $modelAttributes = $this->getModelAttributes($reflection);
+      foreach ($modelAttributes as $model)
+        $model->save();
+
+      $fields = '(';
+      $values = '(';
+      foreach ($attributes as $k => $v)
       {
-        $fields .= $k . ', ';
-        $values .= ':' . $k . ', ';
+        if ($k != 'id')
+        {
+          $fields .= $k . ', ';
+          $values .= ':' . $k . ', ';
+        }
       }
+      $fields = substr($fields, 0, -2) . ')';
+      $values = substr($values, 0, -2) . ')';
+
+      $pdo = PDOS::getInstance();
+
+      if ($this->_id == 0)
+        $this->add($pdo, $table, $fields, $values, $attributes);
+      else
+        $this->update($pdo, $table, $attributes);
     }
-    $fields = substr($fields, 0, -2) . ')';
-    $values = substr($values, 0, -2) . ')';
-
-    $pdo = PDOS::getInstance();
-
-    if ($this->_id == 0)
-      $this->add($pdo, $table, $fields, $values, $attributes);
-    else
-      $this->update($pdo, $table, $attributes);
   }
 
   /**

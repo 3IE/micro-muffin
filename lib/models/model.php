@@ -66,4 +66,27 @@ abstract class Model
     }
     return $attributes;
   }
+
+  /**
+   * @param \ReflectionClass $r
+   * @return Writable[]
+   */
+  protected function getModelAttributes(\ReflectionClass $r)
+  {
+    $attributes = array();
+
+    foreach ($r->getProperties() as $att)
+    {
+      $att->setAccessible(true);
+      if (!$att->isPrivate() && !$att->isStatic())
+      {
+        $object = $att->getValue($this);
+        if ($object instanceof Writable && $object->getModified())
+          $attributes[] = $object;
+      }
+      $att->setAccessible(false);
+    }
+
+    return $attributes;
+  }
 }

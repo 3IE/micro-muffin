@@ -90,22 +90,29 @@ function writeJoin($field, $foreignTable, $foreignField)
   $str          = '';
   $className    = removeSFromTableName($foreignTable);
   $className[0] = strtoupper($className);
-  $var          = '$' . $className;
-  $var[1]       = strtoupper($var[1]);
+  $var          = $className;
+  $var[0]       = strtolower($var[0]);
+
+  //Object field
+  $str .= TAB . "/** @var " . $className . " */\n";
+  $str .= TAB . 'protected $' . $var . " = null;\n\n";
 
   //Getter
   $str .= TAB . "/** @return " . $className . " */\n";
   $str .= TAB . "public function get" . $className . "()\n" . TAB . "{\n";
-  $str .= TAB . TAB . $var . ' = ' . $className . '::find($this->_' . $field . ');' . "\n";
-  $str .= TAB . TAB . 'return ' . $var . ';' . "\n";
-  $str .= TAB . "}\n";
+  $str .= TAB . TAB . 'if (is_null($this->' . $var . '))' . "\n";
+  $str .= TAB . TAB . TAB . '$this->' . $var . ' = ' . $className . '::find($this->_' . $field . ');' . "\n";
+  $str .= TAB . TAB . 'return $this->' . $var . ';' . "\n";
+  $str .= TAB . "}\n\n";
 
   //Setter
   $foreignFieldUp    = $foreignField;
   $foreignFieldUp[0] = strtoupper($foreignFieldUp[0]);
-  $str .= TAB . "public function set" . $className . "(" . $className . " " . $var . ")\n" . TAB . "{\n";
-  $str .= TAB . TAB . '$this->_' . $field . ' = ' . $var . "->get" . $foreignFieldUp . "();\n";
-  $str .= TAB . "}\n";
+  $str .= TAB . "public function set" . $className . "(" . $className . " \$" . $var . ")\n" . TAB . "{\n";
+  $str .= TAB . TAB . '$this->' . $var . ' = $' . $var . ";\n";
+  $str .= TAB . TAB . '$this->_' . $field . ' = $' . $var . "->get" . $foreignFieldUp . "();\n";
+  $str .= TAB . TAB . '$this->_objectEdited();' . "\n";
+  $str .= TAB . "}\n\n";
 
   return $str;
 }
@@ -126,7 +133,7 @@ function writeOverrideBaseFunctions($className)
   $str .= TAB . 'public static function find($id)' . "\n";
   $str .= TAB . "{\n";
   $str .= TAB . TAB . 'return parent::find($id);' . "\n";
-  $str .= TAB . "}\n";
+  $str .= TAB . "}\n\n";
 
   //all
   $str .= TAB . "/**\n";
@@ -140,6 +147,11 @@ function writeOverrideBaseFunctions($className)
   return $str;
 }
 
+/**
+ * @param string $tableName
+ * @param array $fields
+ * @param array $constraints
+ */
 function createT_Model($tableName, $fields, Array $constraints)
 {
   $tableName    = strtolower($tableName);
@@ -174,6 +186,9 @@ function createT_Model($tableName, $fields, Array $constraints)
   }
 }
 
+/**
+ * @param string $name
+ */
 function createModel($name)
 {
   $name         = strtolower($name);
@@ -195,6 +210,10 @@ function createModel($name)
   }
 }
 
+/**
+ * @param \Lib\EPO $pdo
+ * @param string $tableName
+ */
 function writeAllProcedure(\Lib\EPO &$pdo, $tableName)
 {
   $procedureName = 'getall' . $tableName;
@@ -213,6 +232,10 @@ function writeAllProcedure(\Lib\EPO &$pdo, $tableName)
   $pdo->commit();
 }
 
+/**
+ * @param \Lib\EPO $pdo
+ * @param string $tableName
+ */
 function writeFindProcedure(\Lib\EPO &$pdo, $tableName)
 {
   $procedureName = 'get' . substr($tableName, 0, -1) . 'fromid';
@@ -271,8 +294,11 @@ foreach ($query->fetchAll() as $constraint)
 }
 
 //Getting all fields of all tables from public schema
-$query = $pdo->prepare("SELECT table_name, column_name FROM information_schema.columns
-  WHERE table_schema = 'public' ORDER BY table_name");
+$query = $pdo->prepare("
+SELECT table_name, column_name
+FROM information_schema.columns
+WHERE table_schema = 'public'
+ORDER BY table_name");
 $query->execute();
 
 $tables_fields = array();
@@ -301,8 +327,6 @@ foreach ($tables as $table)
 
   //Retrieving the 's' add the end of the table name, if exists
   $table = removeSFromTableName($table);
-  //if ($table[strlen($table) - 1] == 's')
-  //  $table = substr($table, 0, -1);
 
   $className    = $table;
   $className[0] = strtoupper($className[0]);
