@@ -27,8 +27,9 @@ class IndexController extends \Lib\Controller
     //$a = Article::find(1);
     //var_dump($a->getUser());
    // var_dump(new User());
-    $user = User::all();
-    var_dump(User::count());
+    $user = User::find(2);
+    var_dump($user->getComments());
+    var_dump($user->getArticles());
     //var_dump(Comment::find(1)->getArticle()->getUser());
 
     $this->set("mavar", "cocorico");

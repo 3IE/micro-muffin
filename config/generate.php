@@ -85,7 +85,7 @@ function writeField($field, $visible = true)
  * @param string $foreignField
  * @return string
  */
-function writeJoin($field, $foreignTable, $foreignField)
+function writeManyToOneJoin($field, $foreignTable, $foreignField)
 {
   $str          = '';
   $className    = removeSFromTableName($foreignTable);
@@ -112,6 +112,67 @@ function writeJoin($field, $foreignTable, $foreignField)
   $str .= TAB . TAB . '$this->' . $var . ' = $' . $var . ";\n";
   $str .= TAB . TAB . '$this->_' . $field . ' = $' . $var . "->get" . $foreignFieldUp . "();\n";
   $str .= TAB . TAB . '$this->_objectEdited();' . "\n";
+  $str .= TAB . "}\n\n";
+
+  return $str;
+}
+
+/**
+ * WARNING ! Foreign denomination is inverted compared with constraints query result
+ *
+ * @param string $foreignTable
+ * @param string $foreignColumn
+ * @param string $tableName
+ * @return string
+ */
+function writeOneToManyProcedure($foreignTable, $foreignColumn, $tableName)
+{
+  $procedureName = 'otm_' . $foreignTable . 'from' . removeSFromTableName($tableName);
+  $pdo           = \Lib\PDOS::getInstance();
+
+  $pdo->beginTransaction();
+  $pdo->exec("
+  CREATE OR REPLACE FUNCTION " . $procedureName . "(foreign_id numeric)
+  RETURNS SETOF " . $foreignTable . " AS
+  'SELECT * FROM " . $foreignTable . " WHERE " . $foreignColumn . " = foreign_id'
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+  ALTER FUNCTION " . $procedureName . "(numeric)
+  OWNER TO " . DBUSER . ";");
+  $pdo->commit();
+
+  writeLine(' ' . $procedureName . '() written in database');
+
+  return $procedureName;
+}
+
+/**
+ * WARNING ! Foreign denomination is inverted compared with constraints query result
+ *
+ * @param string $foreignTableName
+ * @param string $foreignColumnName
+ * @param string $tableName
+ * @param string $fieldName
+ * @return string
+ */
+function writeOneToManyJoin($foreignTableName, $foreignColumnName, $tableName, $fieldName)
+{
+  $str             = '';
+  $field           = $foreignTableName;
+  $fieldUppered    = $field;
+  $fieldUppered[0] = strtoupper($fieldUppered[0]);
+  $procedure       = writeOneToManyProcedure($foreignTableName, $foreignColumnName, $tableName);
+
+  $str .= TAB . "/**\n";
+  $str .= TAB . " * @return " . substr($fieldUppered, 0, -1) . "[]\n";
+  $str .= TAB . " */\n";
+  $str .= TAB . 'public function get' . $fieldUppered . "()\n";
+  $str .= TAB . "{\n";
+  $str .= TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
+  $str .= TAB . TAB . "\$query = \$pdo->prepare('SELECT * FROM " . $procedure . "('.\$this->_id.')');\n";
+  $str .= TAB . TAB . "\$query->execute();\n";
+  $str .= TAB . TAB . "return \$query->fetchAll();\n";
   $str .= TAB . "}\n\n";
 
   return $str;
@@ -150,9 +211,10 @@ function writeOverrideBaseFunctions($className)
 /**
  * @param string $tableName
  * @param array $fields
- * @param array $constraints
+ * @param array $manyToOneConstraints
+ * @param array $oneToManyConstraints
  */
-function createT_Model($tableName, $fields, Array $constraints)
+function createT_Model($tableName, $fields, Array $manyToOneConstraints, Array $oneToManyConstraints)
 {
   $tableName    = strtolower($tableName);
   $class        = removeSFromTableName($tableName);
@@ -170,13 +232,21 @@ function createT_Model($tableName, $fields, Array $constraints)
 
     foreach ($fields as $field)
     {
-      if ($constrait = getForeignKey($constraints, $field, $tableName))
+      if ($constrait = getForeignKey($manyToOneConstraints, $field, $tableName))
       {
         fwrite($file, writeField($field, false));
-        fwrite($file, writeJoin($field, $constrait['foreign_table_name'], $constrait['foreign_column_name']));
+        fwrite($file, writeManyToOneJoin($field, $constrait['foreign_table_name'], $constrait['foreign_column_name']));
       }
       else
         fwrite($file, writeField($field));
+    }
+
+    if (array_key_exists($tableName, $oneToManyConstraints))
+    {
+      foreach ($oneToManyConstraints[$tableName] as $c)
+      {
+        fwrite($file, writeOneToManyJoin($c['table_name'], $c['column_name'], $c['foreign_table_name'], $c['foreign_column_name']));
+      }
     }
 
     fwrite($file, writeOverrideBaseFunctions(substr($className, 2)));
@@ -260,13 +330,13 @@ function writeCountProcedure(\Lib\EPO &$pdo, $tableName)
 
   $pdo->beginTransaction();
   $pdo->exec("
-  CREATE OR REPLACE FUNCTION count".$tableName."()
+  CREATE OR REPLACE FUNCTION count" . $tableName . "()
   RETURNS bigint AS
-  'SELECT COUNT(id) FROM ".$tableName."'
+  'SELECT COUNT(id) FROM " . $tableName . "'
   LANGUAGE sql VOLATILE
   COST 100;
-  ALTER FUNCTION count".$tableName."()
-  OWNER TO \"".DBHOST."\";
+  ALTER FUNCTION count" . $tableName . "()
+  OWNER TO \"" . DBUSER . "\";
   ");
   $pdo->commit();
 }
@@ -303,10 +373,12 @@ WHERE constraint_type = 'FOREIGN KEY';");
 
 $query->execute();
 
-$constraints = array();
+$manyToOneConstraints = array();
+$oneToManyConstraints = array();
 foreach ($query->fetchAll() as $constraint)
 {
-  $constraints[$constraint['table_name']][] = $constraint;
+  $manyToOneConstraints[$constraint['table_name']][]         = $constraint;
+  $oneToManyConstraints[$constraint['foreign_table_name']][] = $constraint;
 }
 
 //Getting all fields of all tables from public schema
@@ -347,7 +419,7 @@ foreach ($tables as $table)
   $className    = $table;
   $className[0] = strtoupper($className[0]);
 
-  createT_Model($originalTableName, $fields, $constraints);
+  createT_Model($originalTableName, $fields, $manyToOneConstraints, $oneToManyConstraints);
   writeLine(' T_' . $className . ' model written');
 
   createModel($table);
@@ -360,7 +432,7 @@ foreach ($tables as $table)
   writeLine(' get' . substr($originalTableName, 0, -1) . 'fromid() function written in database');
 
   writeCountProcedure($pdo, $originalTableName);
-  writeLine(' count'.$originalTableName.'() function written in database');
+  writeLine(' count' . $originalTableName . '() function written in database');
 
   writeLine("");
 }
