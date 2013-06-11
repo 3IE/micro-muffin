@@ -7,7 +7,7 @@ Its philosophy is quite different than others framework, because **database desi
 
 ##Requirements
 * PHP 5.3
-* Postgresql 9.2
+* Postgresql 8.3
 
 ##Warning
 micro-muffin is still in development. It is not fully tested yet, and not totally functional. Please don't you use for real project for now.

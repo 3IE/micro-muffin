@@ -221,11 +221,10 @@ function writeAllProcedure(\Lib\EPO &$pdo, $tableName)
   $pdo->beginTransaction();
 
   $pdo->exec("CREATE OR REPLACE FUNCTION " . $procedureName . "()
-  RETURNS SETOF JSON AS
-  'SELECT row_to_json(" . $tableName . ") FROM " . $tableName . "'
+  RETURNS SETOF ".$tableName." AS
+  'SELECT * FROM " . $tableName . "'
   LANGUAGE SQL VOLATILE
-  COST 100
-  ROWS 1000;
+  COST 100;
   ALTER FUNCTION " . $procedureName . "()
   OWNER TO \"" . DBUSER . "\";");
 
@@ -245,8 +244,8 @@ function writeFindProcedure(\Lib\EPO &$pdo, $tableName)
   $pdo->beginTransaction();
 
   $pdo->exec("CREATE OR REPLACE FUNCTION " . $procedureName . "(" . $parameter . " numeric)
-  RETURNS json AS
-  'SELECT row_to_json(" . $alias . ") FROM " . $tableName . " " . $alias . " WHERE " . $alias . ".id = " . $parameter . "'
+  RETURNS ".$tableName." AS
+  'SELECT * FROM " . $tableName . " " . $alias . " WHERE " . $alias . ".id = " . $parameter . "'
   LANGUAGE sql VOLATILE
   COST 100;
   ALTER FUNCTION " . $procedureName . "(numeric)

@@ -32,17 +32,16 @@ class Readable extends Model
     $stored_procedure = self::$procstock_find != null ? self::$procstock_find : 'get' . $classLowered . 'fromid';
 
     $pdo = PDOS::getInstance();
-    $req = $pdo->prepare('SELECT ' . $stored_procedure . '(:id)');
+    $req = $pdo->prepare('SELECT * FROM ' . $stored_procedure . '(:id)');
     $req->bindValue(':id', $id, \PDO::PARAM_INT);
     $req->execute();
 
-    $json_object = json_decode($req->fetch(\PDO::FETCH_COLUMN));
+    $result = $req->fetch();
 
-    if (!is_null($json_object))
+    if (!is_null($result))
     {
       $output_object = new $class();
-
-      self::hydrate($output_object, $json_object);
+      self::hydrate($output_object, $result);
 
       return $output_object;
     }
@@ -58,7 +57,7 @@ class Readable extends Model
   private static function hydrate(Model &$object, $data)
   {
     $r = new \ReflectionClass($object);
-    foreach (get_object_vars($data) as $k => $v)
+    foreach ($data as $k => $v)
     {
       $k[0]       = strtoupper($k[0]);
       $methodName = "set" . $k;
@@ -92,17 +91,16 @@ class Readable extends Model
     $proc  = self::$procstock_all != null ? self::$procstock_all : $class . 's';
     $pdo   = PDOS::getInstance();
 
-    $query = $pdo->prepare('SELECT getall' . $proc . '()');
+    $query = $pdo->prepare('SELECT * FROM getall' . $proc . '()');
     $query->execute();
 
-    $datas = $query->fetchAll(\PDO::FETCH_COLUMN);
+    $datas = $query->fetchAll();
 
     $outputs = array();
     foreach ($datas as $d)
     {
-      $json_object = json_decode($d);
       $object      = new $class();
-      self::hydrate($object, $json_object);
+      self::hydrate($object, $d);
       $outputs[] = $object;
     }
     return $outputs;
