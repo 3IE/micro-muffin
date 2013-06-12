@@ -11,6 +11,7 @@ require_once '../lib/epo.php';
 
 define('THIS_MODEL_DIR', '../' . MODEL_DIR);
 define('THIS_T_MODEL_DIR', '../' . TMODEL_DIR);
+define('THIS_SP_MODEL_DIR', '../' . SPMODEL_DIR);
 define('DISCLAIMER', "<?php
 /**
 * WARNING !
@@ -19,6 +20,7 @@ define('DISCLAIMER', "<?php
 */
 \n");
 define('TAB', '  ');
+define('SPMODELMATCH', '#^sp_[a-zA-Z0-9_]+$#');
 
 function writeLine($str)
 {
@@ -330,6 +332,10 @@ function writeFindProcedure(\Lib\EPO &$pdo, $tableName)
   $pdo->commit();
 }
 
+/**
+ * @param \Lib\EPO $pdo
+ * @param string $tableName
+ */
 function writeCountProcedure(\Lib\EPO &$pdo, $tableName)
 {
   $procedureName = 'count' . $tableName;
@@ -345,6 +351,70 @@ function writeCountProcedure(\Lib\EPO &$pdo, $tableName)
   OWNER TO \"" . DBUSER . "\";
   ");
   $pdo->commit();
+}
+
+/**
+ * @param array $storedProcedures
+ */
+function createSP_Models(Array $storedProcedures)
+{
+  if (count($storedProcedures) > 0)
+  {
+    foreach ($storedProcedures as $sp)
+    {
+      if (preg_match(SPMODELMATCH, $sp['name']))
+      {
+        $trunks       = explode('_', $sp['name']);
+        $fileName     = 'sp_' . $trunks[1] . '.php';
+        $className    = 'SP_' . $trunks[1];
+        $className[3] = strtoupper($className[3]);
+
+        $file = fopen(THIS_SP_MODEL_DIR . $fileName, 'w');
+
+        $buffer = '';
+
+        $buffer .= DISCLAIMER;
+        $buffer .= 'class ' . $className . " extends \\Lib\\Models\\Model\n{\n";
+
+        $prototype = 'execute(';
+        $query     = 'SELECT * FROM ' . $sp['name'] . '(';
+
+        if (count($sp['parameters']) > 0)
+        {
+          foreach ($sp['parameters'] as $p)
+          {
+            $prototype .= '$' . $p['name'] . ', ';
+            $query .= '\'.$' . $p['name'] . '.\', ';
+          }
+          $prototype = substr($prototype, 0, -2) . ')';
+          $query     = substr($query, 0, -2) . ')';
+        }
+        else
+        {
+          $prototype .= ')';
+          $query .= ')';
+        }
+
+        $buffer .= TAB . 'public static function ' . $prototype . "\n";
+        $buffer .= TAB . "{\n";
+        $buffer .= TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
+        $buffer .= TAB . TAB . "\$query = \$pdo->prepare('" . $query . "');\n";
+        $buffer .= TAB . TAB . "\$query->execute();\n";
+        $buffer .= TAB . TAB . "return \$query->fetchAll(PDO::FETCH_OBJ);\n";
+        $buffer .= TAB . "}\n\n";
+
+        //$pdo   = \Lib\PDOS::getInstance();
+        //$query = $pdo->prepare("SELECT * FROM ".$sp['name']."(1,1)");
+        //$query->execute();
+        //var_dump($query->fetchAll(PDO::FETCH_NAMED));
+
+        $buffer .= "}\n\n";
+
+        fwrite($file, $buffer);
+        fclose($file);
+      }
+    }
+  }
 }
 
 /**
@@ -410,6 +480,50 @@ foreach ($fields as $field)
 unset($fields);
 unset($field);
 
+//Getting all custom stored procedures (name like sp_*_*) and theirs parameters
+$query            = $pdo->prepare("
+SELECT
+  r.routine_name,
+  r.type_udt_name AS routine_return_type,
+  p.ordinal_position AS parameter_position,
+  p.parameter_name,
+  p.data_type AS parameter_type,
+  p.parameter_mode
+FROM
+  information_schema.routines r
+  LEFT JOIN information_schema.parameters p ON p.specific_name = r.specific_name
+WHERE
+  r.specific_schema = 'public' AND
+  r.routine_type = 'FUNCTION' AND
+  r.routine_name LIKE 'sp_%'
+ORDER BY
+  r.routine_name, parameter_position
+");
+$storedProcedures = array();
+$query->execute();
+
+foreach ($query->fetchAll() as $param)
+{
+  if (!array_key_exists($param['routine_name'], $storedProcedures))
+  {
+    $storedProcedures[$param['routine_name']] = array(
+      'name'        => $param['routine_name'],
+      'return_type' => $param['routine_return_type'],
+      'parameters'  => array()
+    );
+  }
+  if (!is_null($param['parameter_position']) && $param['parameter_mode'] == 'IN')
+  {
+    $storedProcedures[$param['routine_name']]['parameters'][] = array(
+      'name'     => $param['parameter_name'],
+      'type'     => $param['parameter_type'],
+      'position' => $param['parameter_position']
+    );
+  }
+}
+
+var_dump($storedProcedures);
+
 writeLine(count($tables) . ' table' . (count($tables) > 1 ? 's' : '') . ' found');
 writeLine("Generating models...");
 
@@ -442,6 +556,8 @@ foreach ($tables as $table)
 
   writeLine("");
 }
+
+createSP_Models($storedProcedures);
 
 writeLine("Done !");
 writeLine("Generation finished ! Enjoy ;)");
