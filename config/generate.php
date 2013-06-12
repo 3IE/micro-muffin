@@ -164,15 +164,21 @@ function writeOneToManyJoin($foreignTableName, $foreignColumnName, $tableName, $
   $fieldUppered[0] = strtoupper($fieldUppered[0]);
   $procedure       = writeOneToManyProcedure($foreignTableName, $foreignColumnName, $tableName);
 
+  $str .= TAB . '/** @var ' . removeSFromTableName($fieldUppered) . '[] */' . "\n";
+  $str .= TAB . 'protected $' . $field . " = null;\n\n";
   $str .= TAB . "/**\n";
   $str .= TAB . " * @return " . substr($fieldUppered, 0, -1) . "[]\n";
   $str .= TAB . " */\n";
   $str .= TAB . 'public function get' . $fieldUppered . "()\n";
   $str .= TAB . "{\n";
-  $str .= TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
-  $str .= TAB . TAB . "\$query = \$pdo->prepare('SELECT * FROM " . $procedure . "('.\$this->_id.')');\n";
-  $str .= TAB . TAB . "\$query->execute();\n";
-  $str .= TAB . TAB . "return \$query->fetchAll();\n";
+  $str .= TAB . TAB . "if (is_null(\$this->" . $field . "))\n";
+  $str .= TAB . TAB . "{\n";
+  $str .= TAB . TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
+  $str .= TAB . TAB . TAB . "\$query = \$pdo->prepare('SELECT * FROM " . $procedure . "('.\$this->_id.')');\n";
+  $str .= TAB . TAB . TAB . "\$query->execute();\n";
+  $str .= TAB . TAB . TAB . "\$this->" . $field . " = \$query->fetchAll();\n";
+  $str .= TAB . TAB . "}\n";
+  $str .= TAB . TAB . "return \$this->" . $field . ";\n";
   $str .= TAB . "}\n\n";
 
   return $str;
