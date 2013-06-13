@@ -6,7 +6,7 @@
  */
 
 /**
- * HOW TO WRITE CUSTOM STORED PROCEDURE
+ * HOW TO WRITE CUSTOM STORED PROCEDURE WITH MODEL
  * Execute a SQL query like this one :
  *
  * CREATE OR REPLACE FUNCTION sp_truc()
@@ -19,6 +19,12 @@
  * INNER JOIN users u ON a.user_id = u.id'
  * END
  * $func$ LANGUAGE plpgsql;
+ *
+ * OR
+ *
+ * Create your stored procedure with OUT or INOUT parameters
+ *
+ * Naming convention : sp_NAME()
  */
 
 require_once 'config.php';
