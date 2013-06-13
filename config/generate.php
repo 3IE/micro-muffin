@@ -5,6 +5,22 @@
  * Time: 15:55
  */
 
+/**
+ * HOW TO WRITE CUSTOM STORED PROCEDURE
+ * Execute a SQL query like this one :
+ *
+ * CREATE OR REPLACE FUNCTION sp_truc()
+ * RETURNS TABLE(article_id integer, user_id integer) AS
+ * $func$
+ * BEGIN
+ * RETURN QUERY EXECUTE '
+ * SELCET a.id AS article_id, u.id AS user_id
+ * FROM articles a
+ * INNER JOIN users u ON a.user_id = u.id'
+ * END
+ * $func$ LANGUAGE plpgsql;
+ */
+
 require_once 'config.php';
 require_once '../lib/pdos.php';
 require_once '../lib/epo.php';
@@ -401,14 +417,10 @@ function createSP_Models(Array $storedProcedures)
         $buffer .= TAB . TAB . "\$query = \$pdo->prepare('" . $query . "');\n";
         $buffer .= TAB . TAB . "\$query->execute();\n";
         $buffer .= TAB . TAB . "return \$query->fetchAll(PDO::FETCH_OBJ);\n";
+
         $buffer .= TAB . "}\n\n";
 
-        //$pdo   = \Lib\PDOS::getInstance();
-        //$query = $pdo->prepare("SELECT * FROM ".$sp['name']."(1,1)");
-        //$query->execute();
-        //var_dump($query->fetchAll(PDO::FETCH_NAMED));
-
-        $buffer .= "}\n\n";
+        $buffer .= "}\n";
 
         fwrite($file, $buffer);
         fclose($file);
