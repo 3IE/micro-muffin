@@ -380,9 +380,9 @@ function createSP_Models(Array $storedProcedures)
     {
       if (preg_match(SPMODELMATCH, $sp['name']))
       {
-        $trunks       = explode('_', $sp['name']);
-        $fileName     = 'sp_' . $trunks[1] . '.php';
-        $className    = 'SP_' . $trunks[1];
+        $name         = substr($sp['name'], 3);
+        $fileName     = 'sp_' . $name . '.php';
+        $className    = 'SP_' . $name;
         $className[3] = strtoupper($className[3]);
 
         $file = fopen(THIS_SP_MODEL_DIR . $fileName, 'w');
@@ -392,18 +392,59 @@ function createSP_Models(Array $storedProcedures)
         $buffer .= DISCLAIMER;
         $buffer .= 'class ' . $className . " extends \\Lib\\Models\\Model\n{\n";
 
+        //Writing class fields (OUT parameters)
+        if (count($sp['parameters']) > 0)
+        {
+          foreach ($sp['parameters'] as $p)
+          {
+            if ($p['mode'] == 'OUT' || $p['mode'] == 'INOUT')
+            {
+              $nameUppered    = $p['name'];
+              $nameUppered[0] = strtoupper($nameUppered[0]);
+
+              //Field
+              $buffer .= TAB . "private \$" . $p['name'] . ";\n\n";
+
+              //Getter
+              $buffer .= TAB . "public function get" . $nameUppered . "()\n";
+              $buffer .= TAB . "{\n";
+              $buffer .= TAB . TAB . "return \$this->" . $p['name'] . ";\n";
+              $buffer .= TAB . "}\n\n";
+
+              //Setter
+              $buffer .= TAB . "private function set" . $nameUppered . "(\$" . $p['name'] . ")\n";
+              $buffer .= TAB . "{\n";
+              $buffer .= TAB . TAB . "\$this->" . $p['name'] . " = \$" . $p['name'] . ";\n";
+              $buffer .= TAB . "}\n\n";
+            }
+          }
+        }
+
         $prototype = 'execute(';
         $query     = 'SELECT * FROM ' . $sp['name'] . '(';
 
         if (count($sp['parameters']) > 0)
         {
+          $in_params = false;
           foreach ($sp['parameters'] as $p)
           {
-            $prototype .= '$' . $p['name'] . ', ';
-            $query .= '\'.$' . $p['name'] . '.\', ';
+            if ($p['mode'] == 'IN' || $p['mode'] == 'INOUT')
+            {
+              $in_params = true;
+              $prototype .= '$' . $p['name'] . ', ';
+              $query .= '\'.$' . $p['name'] . '.\', ';
+            }
           }
-          $prototype = substr($prototype, 0, -2) . ')';
-          $query     = substr($query, 0, -2) . ')';
+          if ($in_params)
+          {
+            $prototype = substr($prototype, 0, -2) . ')';
+            $query     = substr($query, 0, -2) . ')';
+          }
+          else
+          {
+            $prototype .= ')';
+            $query .= ')';
+          }
         }
         else
         {
@@ -411,13 +452,23 @@ function createSP_Models(Array $storedProcedures)
           $query .= ')';
         }
 
+        //Execute function
+        $buffer .= TAB . "/**\n";
+        $buffer .= TAB . " * @return " . $className . "[]\n";
+        $buffer .= TAB . " */\n";
         $buffer .= TAB . 'public static function ' . $prototype . "\n";
         $buffer .= TAB . "{\n";
         $buffer .= TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
         $buffer .= TAB . TAB . "\$query = \$pdo->prepare('" . $query . "');\n";
         $buffer .= TAB . TAB . "\$query->execute();\n";
-        $buffer .= TAB . TAB . "return \$query->fetchAll(PDO::FETCH_OBJ);\n";
-
+        $buffer .= TAB . TAB . "\$res = array();\n";
+        $buffer .= TAB . TAB . "foreach(\$query->fetchAll() as \$v)\n";
+        $buffer .= TAB . TAB . "{\n";
+        $buffer .= TAB . TAB . TAB . "\$obj = new " . $className . "();\n";
+        $buffer .= TAB . TAB . TAB . "self::hydrate(\$obj, \$v);\n";
+        $buffer .= TAB . TAB . TAB . "\$res[] = \$obj;\n";
+        $buffer .= TAB . TAB . "}\n";
+        $buffer .= TAB . TAB . "return \$res;\n";
         $buffer .= TAB . "}\n\n";
 
         $buffer .= "}\n";
@@ -524,11 +575,12 @@ foreach ($query->fetchAll() as $param)
       'parameters'  => array()
     );
   }
-  if (!is_null($param['parameter_position']) && $param['parameter_mode'] == 'IN')
+  if (!is_null($param['parameter_position']))
   {
     $storedProcedures[$param['routine_name']]['parameters'][] = array(
       'name'     => $param['parameter_name'],
       'type'     => $param['parameter_type'],
+      'mode'     => $param['parameter_mode'],
       'position' => $param['parameter_position']
     );
   }

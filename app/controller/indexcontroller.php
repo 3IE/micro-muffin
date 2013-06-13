@@ -28,8 +28,8 @@ class IndexController extends \Lib\Controller
     //var_dump($a->getUser());
    // var_dump(new User());
     $user = User::find(2);
-    var_dump(SP_Comment::execute(1,1));
-    var_dump(SP_Tata::execute());
+    //var_dump(SP_Comment::execute(1,1));
+    var_dump(SP_Truc::execute());
     //var_dump(Comment::find(1)->getArticle()->getUser());
 
     $this->set("mavar", "cocorico");

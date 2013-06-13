@@ -52,37 +52,6 @@ class Readable extends Model
   }
 
   /**
-   * @param Model $object
-   * @param $data
-   * @return void
-   */
-  private static function hydrate(Model &$object, $data)
-  {
-    $r = new \ReflectionClass($object);
-    foreach ($data as $k => $v)
-    {
-      $k[0]       = strtoupper($k[0]);
-      $methodName = "set" . $k;
-      $method     = $r->getMethod($methodName);
-      $method->setAccessible(true);
-      $method->invoke($object, $v);
-      $method->setAccessible(false);
-    }
-
-    /**
-     * The object come from the database so it's not edited, but setter were used, so we need to restore
-     * the _modified state by calling private function _objectNotModified
-     */
-    if ($r->hasMethod("_objectNotEdited"))
-    {
-      $method = $r->getMethod("_objectNotEdited");
-      $method->setAccessible(true);
-      $method->invoke($object);
-      $method->setAccessible(false);
-    }
-  }
-
-  /**
    * Find all models in database
    *
    * @return Model[]
