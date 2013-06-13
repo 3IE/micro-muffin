@@ -37,6 +37,8 @@ define('DISCLAIMER', "<?php
 \n");
 define('TAB', '  ');
 define('SPMODELMATCH', '#^sp_[a-zA-Z0-9_]+$#');
+define('RO_CHMOD', 0440);
+define('W_CHMOD', 0660);
 
 function writeLine($str)
 {
@@ -279,7 +281,7 @@ function createT_Model($tableName, $fields, Array $manyToOneConstraints, Array $
     fwrite($file, "}\n");
     fclose($file);
 
-    chmod($filename, 0440);
+    chmod($filename, RO_CHMOD);
   }
 }
 
@@ -483,7 +485,7 @@ function createSP_Models(Array $storedProcedures)
           fwrite($file, $buffer);
           fclose($file);
 
-          chmod($filepath, 0440);
+          chmod($filepath, RO_CHMOD);
           writeLine(" " . $className . " model written");
         }
       }
@@ -497,7 +499,7 @@ function emptyDirectory($dirName)
   {
     if (!$file->isDot() && $file->getFilename() != 'empty')
     {
-      chmod($file->getPathname(), 0660);
+      chmod($file->getPathname(), W_CHMOD);
       unlink($file->getPathname());
     }
   }
