@@ -534,8 +534,6 @@ foreach ($query->fetchAll() as $param)
   }
 }
 
-var_dump($storedProcedures);
-
 writeLine(count($tables) . ' table' . (count($tables) > 1 ? 's' : '') . ' found');
 writeLine("Generating models...");
 
