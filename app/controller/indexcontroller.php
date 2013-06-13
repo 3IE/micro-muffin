@@ -9,30 +9,7 @@
 
 class IndexController extends \Lib\Controller
 {
-  public function toArray($object)
-  {
-    $array = array();
-    var_dump(get_object_vars($object));
-    foreach (get_class_vars(get_class($object)) as $k => $v)
-    {
-      $array[$k] = $v;
-    }
-    return $array;
-  }
-
   public function index($params = array())
   {
-    /** @var User $u */
-    //var_dump(Article::all());
-    //$a = Article::find(1);
-    //var_dump($a->getUser());
-   // var_dump(new User());
-    $user = User::find(2);
-    //var_dump(SP_Comment::execute(1,1));
-    var_dump(SP_Truc::execute());
-    //var_dump(Comment::find(1)->getArticle()->getUser());
-
-    $this->set("mavar", "cocorico");
-    $this->render = "false";
   }
 }

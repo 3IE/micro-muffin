@@ -9,6 +9,6 @@ class BaseController extends \Lib\Controller
 {
     public function layout($params = array())
     {
-        $this->set("lol", "21");
+
     }
 }
