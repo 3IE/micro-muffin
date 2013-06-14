@@ -120,12 +120,19 @@ function writeManyToOneJoin($field, $foreignTable, $foreignField)
   $var[0]       = strtolower($var[0]);
 
   //Object field
+  //FIXME - Fixe à l'arrache, à recoder proprement !
+  $this_field_tab = explode("_", $field);
+  $object_field = $this_field_tab[0];
+  $object_fieldUp = $object_field;
+  $object_fieldUp[0] = strtoupper($object_fieldUp[0]);
+  //FIXME - End fix degueulasse
+  $var = $object_field;
   $str .= TAB . "/** @var " . $className . " */\n";
   $str .= TAB . 'protected $' . $var . " = null;\n\n";
 
   //Getter
   $str .= TAB . "/** @return " . $className . " */\n";
-  $str .= TAB . "public function get" . $className . "()\n" . TAB . "{\n";
+  $str .= TAB . "public function get" . $object_fieldUp . "()\n" . TAB . "{\n";
   $str .= TAB . TAB . 'if (is_null($this->' . $var . '))' . "\n";
   $str .= TAB . TAB . TAB . '$this->' . $var . ' = ' . $className . '::find($this->_' . $field . ');' . "\n";
   $str .= TAB . TAB . 'return $this->' . $var . ';' . "\n";
@@ -134,7 +141,7 @@ function writeManyToOneJoin($field, $foreignTable, $foreignField)
   //Setter
   $foreignFieldUp    = $foreignField;
   $foreignFieldUp[0] = strtoupper($foreignFieldUp[0]);
-  $str .= TAB . "public function set" . $className . "(" . $className . " \$" . $var . ")\n" . TAB . "{\n";
+  $str .= TAB . "public function set" . $object_fieldUp . "(" . $className . " \$" . $var . ")\n" . TAB . "{\n";
   $str .= TAB . TAB . '$this->' . $var . ' = $' . $var . ";\n";
   $str .= TAB . TAB . '$this->_' . $field . ' = $' . $var . "->get" . $foreignFieldUp . "();\n";
   $str .= TAB . TAB . '$this->_objectEdited();' . "\n";
@@ -274,6 +281,7 @@ function createT_Model($tableName, $fields, Array $manyToOneConstraints, Array $
         fwrite($file, writeField($field));
     }
 
+    /*
     if (array_key_exists($tableName, $oneToManyConstraints))
     {
       foreach ($oneToManyConstraints[$tableName] as $c)
@@ -281,6 +289,7 @@ function createT_Model($tableName, $fields, Array $manyToOneConstraints, Array $
         fwrite($file, writeOneToManyJoin($c['table_name'], $c['column_name'], $c['foreign_table_name'], $c['foreign_column_name']));
       }
     }
+    */
 
     fwrite($file, writeOverrideBaseFunctions(substr($className, 2)));
 
