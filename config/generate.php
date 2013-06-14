@@ -160,7 +160,7 @@ function writeOneToManyProcedure($foreignTable, $foreignColumn, $tableName)
   $pdo->exec("
   CREATE OR REPLACE FUNCTION " . $procedureName . "(foreign_id numeric)
   RETURNS SETOF " . $foreignTable . " AS
-  'SELECT * FROM " . $foreignTable . " WHERE " . $foreignColumn . " = foreign_id'
+  'SELECT * FROM " . $foreignTable . " WHERE " . $foreignColumn . " = \$1'
   LANGUAGE sql VOLATILE
   COST 100
   ROWS 1000;
@@ -350,7 +350,7 @@ function writeFindProcedure(\Lib\EPO &$pdo, $tableName)
 
   $pdo->exec("CREATE OR REPLACE FUNCTION " . $procedureName . "(" . $parameter . " numeric)
   RETURNS " . $tableName . " AS
-  'SELECT * FROM " . $tableName . " " . $alias . " WHERE " . $alias . ".id = " . $parameter . "'
+  'SELECT * FROM " . $tableName . " " . $alias . " WHERE " . $alias . ".id = \$1'
   LANGUAGE sql VOLATILE
   COST 100;
   ALTER FUNCTION " . $procedureName . "(numeric)

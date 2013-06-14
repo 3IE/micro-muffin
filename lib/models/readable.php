@@ -40,7 +40,7 @@ class Readable extends Model
 
     $result = $req->fetch();
 
-    if (!is_null($result))
+    if (!is_null($result) && !is_null($result['id']))
     {
       $output_object = new $class();
       self::hydrate($output_object, $result);
