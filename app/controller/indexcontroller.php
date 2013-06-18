@@ -14,6 +14,8 @@ class IndexController extends \Lib\Controller
     /*$a = Article::find(1);
     $a->getUser();
     var_dump($a);*/
-    var_dump(SP_Users::execute());
+    //var_dump(SP_Users::execute());
+
+    var_dump(User::find(1)->getArticlesFromValidateur());
   }
 }

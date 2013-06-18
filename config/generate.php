@@ -131,9 +131,9 @@ function writeManyToOneJoin($field, $foreignTable, $foreignField)
 
   //Object field
   //FIXME - Fixe à l'arrache, à recoder proprement !
-  $this_field_tab = explode("_", $field);
-  $object_field = $this_field_tab[0];
-  $object_fieldUp = $object_field;
+  $this_field_tab    = explode("_", $field);
+  $object_field      = $this_field_tab[0];
+  $object_fieldUp    = $object_field;
   $object_fieldUp[0] = strtoupper($object_fieldUp[0]);
   //FIXME - End fix degueulasse
   $var = $object_field;
@@ -165,23 +165,25 @@ function writeManyToOneJoin($field, $foreignTable, $foreignField)
  *
  * @param string $foreignTable
  * @param string $foreignColumn
+ * @param string $foreignColumnClean
  * @param string $tableName
+ * @param string $columnType
  * @return string
  */
-function writeOneToManyProcedure($foreignTable, $foreignColumn, $tableName)
+function writeOneToManyProcedure($foreignTable, $foreignColumn, $foreignColumnClean, $tableName, $columnType)
 {
-  $procedureName = 'otm_' . $foreignTable . 'from' . removeSFromTableName($tableName);
+  $procedureName = strtolower('otm_' . $foreignTable . 'from' . removeSFromTableName($tableName) . '_' . $foreignColumnClean);
   $pdo           = \Lib\PDOS::getInstance();
 
   $pdo->beginTransaction();
   $pdo->exec("
-  CREATE OR REPLACE FUNCTION " . $procedureName . "(foreign_id numeric)
+  CREATE OR REPLACE FUNCTION " . $procedureName . "(foreign_column " . $columnType . ")
   RETURNS SETOF " . $foreignTable . " AS
   'SELECT * FROM " . $foreignTable . " WHERE " . $foreignColumn . " = \$1'
   LANGUAGE sql VOLATILE
   COST 100
   ROWS 1000;
-  ALTER FUNCTION " . $procedureName . "(numeric)
+  ALTER FUNCTION " . $procedureName . "(" . $columnType . ")
   OWNER TO " . DBUSER . ";");
   $pdo->commit();
 
@@ -197,31 +199,45 @@ function writeOneToManyProcedure($foreignTable, $foreignColumn, $tableName)
  * @param string $foreignColumnName
  * @param string $tableName
  * @param string $fieldName
+ * @param string $columnType
  * @return string
  */
-function writeOneToManyJoin($foreignTableName, $foreignColumnName, $tableName, $fieldName)
+function writeOneToManyJoin($foreignTableName, $foreignColumnName, $tableName, $fieldName, $columnType)
 {
-  $str             = '';
+  $str = '';
+
+  $joinColumn = $foreignColumnName;
+  if (substr($joinColumn, strlen($joinColumn) - 3) == '_id')
+    $joinColumn = substr($joinColumn, 0, -3);
+  else if (substr($joinColumn, strlen($joinColumn) - 2 == 'Id'))
+    $joinColumn = substr($joinColumn, 0, -2);
+  $joinColumn    = strtolower($joinColumn);
+  $joinColumn[0] = strtoupper($joinColumn[0]);
+
+  $var             = $foreignTableName . 'From' . $joinColumn;
+  $varUppered      = $var;
+  $varUppered[0]   = strtoupper($varUppered[0]);
   $field           = $foreignTableName;
   $fieldUppered    = $field;
   $fieldUppered[0] = strtoupper($fieldUppered[0]);
-  $procedure       = writeOneToManyProcedure($foreignTableName, $foreignColumnName, $tableName);
+
+  $procedure = writeOneToManyProcedure($foreignTableName, $foreignColumnName, $joinColumn, $tableName, $columnType);
 
   $str .= TAB . '/** @var ' . removeSFromTableName($fieldUppered) . '[] */' . "\n";
-  $str .= TAB . 'protected $' . $field . " = null;\n\n";
+  $str .= TAB . 'protected $' . $var . " = null;\n\n";
   $str .= TAB . "/**\n";
   $str .= TAB . " * @return " . substr($fieldUppered, 0, -1) . "[]\n";
   $str .= TAB . " */\n";
-  $str .= TAB . 'public function get' . $fieldUppered . "()\n";
+  $str .= TAB . 'public function get' . $varUppered . "()\n";
   $str .= TAB . "{\n";
-  $str .= TAB . TAB . "if (is_null(\$this->" . $field . "))\n";
+  $str .= TAB . TAB . "if (is_null(\$this->" . $var . "))\n";
   $str .= TAB . TAB . "{\n";
   $str .= TAB . TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
-  $str .= TAB . TAB . TAB . "\$query = \$pdo->prepare('SELECT * FROM " . $procedure . "('.\$this->_id.')');\n";
+  $str .= TAB . TAB . TAB . "\$query = \$pdo->prepare('SELECT * FROM " . $procedure . "('.\$this->_" . $fieldName . ".')');\n";
   $str .= TAB . TAB . TAB . "\$query->execute();\n";
-  $str .= TAB . TAB . TAB . "\$this->" . $field . " = \$query->fetchAll();\n";
+  $str .= TAB . TAB . TAB . "\$this->" . $var . " = \$query->fetchAll();\n";
   $str .= TAB . TAB . "}\n";
-  $str .= TAB . TAB . "return \$this->" . $field . ";\n";
+  $str .= TAB . TAB . "return \$this->" . $var . ";\n";
   $str .= TAB . "}\n\n";
 
   return $str;
@@ -291,15 +307,13 @@ function createT_Model($tableName, $fields, Array $manyToOneConstraints, Array $
         fwrite($file, writeField($field));
     }
 
-    /*
     if (array_key_exists($tableName, $oneToManyConstraints))
     {
       foreach ($oneToManyConstraints[$tableName] as $c)
       {
-        fwrite($file, writeOneToManyJoin($c['table_name'], $c['column_name'], $c['foreign_table_name'], $c['foreign_column_name']));
+        fwrite($file, writeOneToManyJoin($c['table_name'], $c['column_name'], $c['foreign_table_name'], $c['foreign_column_name'], $c['foreign_column_type']));
       }
     }
-    */
 
     fwrite($file, writeOverrideBaseFunctions(substr($className, 2)));
 
@@ -561,13 +575,16 @@ writeLine("Retrieving database public schema...");
 //Getting constraints
 $query = $pdo->prepare("
 SELECT
-    tc.table_name, kcu.column_name,
+    tc.table_name,
+    kcu.column_name,
     ccu.table_name AS foreign_table_name,
-    ccu.column_name AS foreign_column_name
+    ccu.column_name AS foreign_column_name,
+    c.data_type AS foreign_column_type
 FROM
     information_schema.table_constraints AS tc
     JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
     JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
+    JOIN information_schema.columns AS c ON c.table_name = ccu.table_name AND c.column_name = ccu.column_name
 WHERE constraint_type = 'FOREIGN KEY';");
 
 $query->execute();
@@ -603,7 +620,7 @@ foreach ($fields as $field)
 unset($fields);
 unset($field);
 
-//Getting all custom stored procedures (name like sp_*_*) and theirs parameters
+//Getting all custom stored procedures (name like sp_*) and theirs parameters
 $query            = $pdo->prepare("
 SELECT
   r.routine_name,
