@@ -10,4 +10,4 @@ Its philosophy is quite different than others framework, because **database desi
 * Postgresql 8.3
 
 ##Warning
-micro-muffin is still in development. It is not fully tested yet, and not totally functional. Please don't you use for real project for now.
+micro-muffin is still in development. It is not fully tested yet, and not totally functional. Please don't use it for real project for now.

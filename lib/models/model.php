@@ -25,7 +25,7 @@ abstract class Model
   /**
    * @param int $id
    */
-  protected function setId($id)
+  private function setId($id)
   {
     $this->_id = $id;
   }

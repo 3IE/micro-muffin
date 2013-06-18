@@ -11,8 +11,9 @@ class IndexController extends \Lib\Controller
 {
   public function index($params = array())
   {
-    $a = Article::find(1);
+    /*$a = Article::find(1);
     $a->getUser();
-    var_dump($a);
+    var_dump($a);*/
+    var_dump(SP_Users::execute());
   }
 }

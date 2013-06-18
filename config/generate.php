@@ -46,6 +46,16 @@ define('SPMODELMATCH', '#^sp_[a-zA-Z0-9_]+$#');
 define('RO_CHMOD', 0440);
 define('W_CHMOD', 0660);
 
+function isTypeString($var)
+{
+  $stringType = array(
+    'character varying',
+    'text'
+  );
+
+  return in_array($var, $stringType);
+}
+
 function writeLine($str)
 {
   echo $str . "\n";
@@ -456,7 +466,10 @@ function createSP_Models(Array $storedProcedures)
               {
                 $in_params = true;
                 $prototype .= '$' . $p['name'] . ', ';
-                $query .= '\'.$' . $p['name'] . '.\', ';
+                if (isTypeString($p['type']))
+                  $query .= '\\\'\'.$' . $p['name'] . '.\'\\\', ';
+                else
+                  $query .= '\'.$' . $p['name'] . '.\', ';
               }
             }
             if ($in_params)
