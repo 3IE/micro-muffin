@@ -402,7 +402,7 @@ function writeCountProcedure(\Lib\EPO &$pdo, $tableName)
 
   $pdo->beginTransaction();
   $pdo->exec("
-  CREATE OR REPLACE FUNCTION count" . $tableName . "()
+  CREATE OR REPLACE FUNCTION " . $procedureName . "()
   RETURNS bigint AS
   'SELECT COUNT(id) FROM " . $tableName . "'
   LANGUAGE sql VOLATILE
@@ -537,6 +537,7 @@ function createSP_Models(Array $storedProcedures)
 
 function emptyDirectory($dirName)
 {
+  /** @var $file DirectoryIterator */
   foreach (new DirectoryIterator($dirName) as $file)
   {
     if (!$file->isDot() && $file->getFilename() != 'empty')
