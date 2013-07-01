@@ -151,7 +151,8 @@ function writeManyToOneJoin($field, $foreignTable, $foreignField)
   //Setter
   $foreignFieldUp    = $foreignField;
   $foreignFieldUp[0] = strtoupper($foreignFieldUp[0]);
-  $str .= TAB . "public function set" . $object_fieldUp . "(" . $className . " \$" . $var . ")\n" . TAB . "{\n";
+  $str .= TAB . "/** @param " . $className . " \$" . $var . "*/\n";
+  $str .= TAB . "public function set" . $object_fieldUp . "(\$" . $var . ")\n" . TAB . "{\n";
   $str .= TAB . TAB . '$this->' . $var . ' = $' . $var . ";\n";
   $str .= TAB . TAB . '$this->_' . $field . ' = $' . $var . "->get" . $foreignFieldUp . "();\n";
   $str .= TAB . TAB . '$this->_objectEdited();' . "\n";
