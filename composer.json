@@ -1,0 +1,10 @@
+{
+    "name": "mrblackus/micro-muffin",
+    "description": "micro-muffin PHP framework",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Mathieu Savy"
+        }
+    ]
+}
