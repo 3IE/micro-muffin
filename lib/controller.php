@@ -12,64 +12,74 @@ namespace Lib;
 
 class Controller
 {
-    protected $variables = array();
+  protected $variables = array();
 
-    /** @var string $render */
-    protected $render = "true";
+  /** @var string $render */
+  protected $render = "true";
+  /** @var string $render_layout */
+  protected $render_layout = "true";
 
-    /**
-     * @param string $name
-     * @param mixed $val
-     */
-    protected function set($name, $val)
-    {
-        $this->variables[$name] = $val;
-    }
+  /**
+   * @param string $name
+   * @param mixed $val
+   */
+  protected function set($name, $val)
+  {
+    $this->variables[$name] = $val;
+  }
 
-    /**
-     * @return array
-     */
-    public function getVariables()
-    {
-        return $this->variables;
-    }
+  /**
+   * @return array
+   */
+  public function getVariables()
+  {
+    return $this->variables;
+  }
 
-    /**
-     * @return string
-     */
-    public function getRender()
-    {
-        return $this->render;
-    }
+  /**
+   * @return string
+   */
+  public function getRender()
+  {
+    return $this->render;
+  }
 
-    /**
-     * @param string $url
-     * @return void
-     */
-    public static function redirect($url)
-    {
-        header("Location: " . $url);
-        die();
-    }
+  /**
+   * @return string
+   */
+  public function getRenderLayout()
+  {
+    return $this->render_layout;
+  }
 
-    public static function setIntented($intented)
-    {
-        $_SESSION["intented"] = $intented;
-    }
+  /**
+   * @param string $url
+   * @return void
+   */
+  public static function redirect($url)
+  {
+    header("Location: " . $url);
+    die();
+  }
 
-    public static function getIntented()
-    {
-        if (isset($_SESSION["intented"]) == false)
-            return "";
-        return $_SESSION["intented"];
-    }
+  public static function setIntented($intented)
+  {
+    $_SESSION["intented"] = $intented;
+  }
 
-    public function redirect_intented()
-    {
-        if (isset($_SESSION["intented"]) == false)
-            header("Location: /");
-        else
-            header("Location: " . $_SESSION["intented"]);
-        die();
-    }
+  public static function getIntented()
+  {
+    if (isset($_SESSION["intented"]) == false)
+      return "";
+    return $_SESSION["intented"];
+  }
+
+  public function redirect_intented()
+  {
+    if (isset($_SESSION["intented"]) == false)
+      header("Location: /");
+    else
+      header("Location: " . $_SESSION["intented"]);
+    die();
+  }
 }

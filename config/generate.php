@@ -453,7 +453,7 @@ function createSP_Models(Array $storedProcedures)
                 $nameUppered[0] = strtoupper($nameUppered[0]);
 
                 //Field
-                $buffer .= TAB . "private \$" . $p['name'] . ";\n\n";
+                $buffer .= TAB . "protected \$" . $p['name'] . ";\n\n";
 
                 //Getter
                 $buffer .= TAB . "public function get" . $nameUppered . "()\n";
@@ -462,7 +462,7 @@ function createSP_Models(Array $storedProcedures)
                 $buffer .= TAB . "}\n\n";
 
                 //Setter
-                $buffer .= TAB . "private function set" . $nameUppered . "(\$" . $p['name'] . ")\n";
+                $buffer .= TAB . "protected function set" . $nameUppered . "(\$" . $p['name'] . ")\n";
                 $buffer .= TAB . "{\n";
                 $buffer .= TAB . TAB . "\$this->" . $p['name'] . " = \$" . $p['name'] . ";\n";
                 $buffer .= TAB . "}\n\n";
