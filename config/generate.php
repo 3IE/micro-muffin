@@ -278,8 +278,9 @@ function writeOverrideBaseFunctions($className)
  * @param array $fields
  * @param array $manyToOneConstraints
  * @param array $oneToManyConstraints
+ * @param array $sequences
  */
-function createT_Model($tableName, $fields, Array $manyToOneConstraints, Array $oneToManyConstraints)
+function createT_Model($tableName, $fields, Array $manyToOneConstraints, Array $oneToManyConstraints, Array $sequences)
 {
   $tableName    = strtolower($tableName);
   $class        = removeSFromTableName($tableName);
@@ -294,7 +295,8 @@ function createT_Model($tableName, $fields, Array $manyToOneConstraints, Array $
     fwrite($file, DISCLAIMER);
     fwrite($file, 'class ' . $className . ' extends \Lib\Models\Deletable' . "\n{\n");
 
-    fwrite($file, TAB . "protected static \$table_name = '" . $tableName . "';\n\n");
+    fwrite($file, TAB . "protected static \$table_name = '" . $tableName . "';\n");
+    fwrite($file, TAB . "protected static \$sequence_name = '" . $sequences[$tableName] . "';\n\n");
 
     foreach ($fields as $field)
     {
@@ -600,12 +602,19 @@ foreach ($query->fetchAll() as $constraint)
 
 //Getting all fields of all tables from public schema
 $query = $pdo->prepare("
-SELECT table_name, column_name
-FROM information_schema.columns
-WHERE table_schema = 'public'
-ORDER BY table_name");
+SELECT
+  table_name,
+  column_name,
+  pg_get_serial_sequence(table_name, column_name) AS sequence_name
+FROM
+  information_schema.columns
+WHERE
+  table_schema = 'public'
+ORDER BY
+  table_name");
 $query->execute();
 
+$sequences     = array();
 $tables_fields = array();
 $tables        = array();
 $fields        = $query->fetchAll();
@@ -613,9 +622,13 @@ $fields        = $query->fetchAll();
 foreach ($fields as $field)
 {
   if (!in_array($field['table_name'], $tables))
+  {
     $tables[] = $field['table_name'];
+  }
   if ($field['column_name'] != 'id')
     $tables_fields[$field['table_name']][] = $field['column_name'];
+  if (!is_null($field['sequence_name']))
+    $sequences[$field['table_name']] = explode('public.', $field['sequence_name'])[1];
 }
 
 unset($fields);
@@ -679,7 +692,7 @@ foreach ($tables as $table)
   $className    = $table;
   $className[0] = strtoupper($className[0]);
 
-  createT_Model($originalTableName, $fields, $manyToOneConstraints, $oneToManyConstraints);
+  createT_Model($originalTableName, $fields, $manyToOneConstraints, $oneToManyConstraints, $sequences);
   writeLine(' T_' . $className . ' model written');
 
   createModel($table);

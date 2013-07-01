@@ -16,6 +16,8 @@ class Writable extends Readable
 {
   /** @var bool */
   private $_modified = true;
+  /** @var string|null */
+  protected static $sequence_name = null;
 
   protected function _objectEdited()
   {
@@ -93,7 +95,7 @@ class Writable extends Readable
         $query->bindValue(':' . $k, $v);
     }
     $query->execute();
-    $this->setId($pdo->lastInsertId());
+    $this->setId($pdo->lastInsertId(self::$sequence_name));
     $pdo->commit();
   }
 

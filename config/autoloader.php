@@ -11,7 +11,12 @@ class Autoloader
 {
 
   private static $include_path = array(
-    CONTROLLER_DIR, MODEL_DIR, TMODEL_DIR, SPMODEL_DIR, LIB_DIR, LIBMODEL_DIR
+    CONTROLLER_DIR,
+    MODEL_DIR,
+    TMODEL_DIR,
+    SPMODEL_DIR,
+    LIB_DIR,
+    LIBMODEL_DIR
   );
 
   public function __construct()
