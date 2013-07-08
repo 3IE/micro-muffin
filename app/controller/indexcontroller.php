@@ -11,16 +11,5 @@ class IndexController extends \Lib\Controller
 {
   public function index($params = array())
   {
-    /*$a = Article::find(1);
-    $a->getUser();
-    var_dump($a);*/
-    //var_dump(SP_Users::execute());
-
-    //var_dump(User::find(1)->getArticlesFromValidateur());
-    $user = new User();
-    $user->setLogin("gfrhebfhb");
-    $user->setPassword("3333");
-    $user->save();
-
   }
 }
