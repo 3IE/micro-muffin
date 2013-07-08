@@ -19,13 +19,13 @@ class Select extends Field
 
   public function __construct($name, Array $options, $required)
   {
-    $this->name = $name;
-    $this->options = $options;
+    $this->name     = $name;
+    $this->options  = $options;
     $this->required = $required;
   }
 
   /**
-   * @param string$name
+   * @param string $name
    * @param mixed $value
    * @return $this
    */
@@ -64,7 +64,10 @@ class Select extends Field
     $str .= '<select>';
     foreach ($this->options as $k => $v)
     {
-      $str .= '<option value="'.$k.'">'.$v.'</option>';
+      if ($this->selected == $k)
+        $str .= '<option value="' . $k . '" selected="selected">' . $v . '</option>';
+      else
+        $str .= '<option value="' . $k . '">' . $v . '</option>';
     }
     $str .= '</select></div></div>';
 
