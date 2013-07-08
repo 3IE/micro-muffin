@@ -41,8 +41,7 @@ class Input extends Field
   /**
    * @param string $name
    * @param string $type
-   * @param bool $required
-   * @return $this
+   * @param int $required
    */
   public function __construct($name, $type, $required)
   {
@@ -50,7 +49,6 @@ class Input extends Field
     $this->type     = $type;
     $this->required = $required;
     $this->value    = null;
-    return $this;
   }
 
   /**

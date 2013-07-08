@@ -9,13 +9,43 @@
 
 namespace Lib\Form;
 
-class Checkbox extends Field{
+class Checkbox extends Field
+{
+  /** @var bool */
+  private $checked;
+
+  /**
+   * @param string $name
+   * @param int $required
+   */
+  public function __construct($name, $required)
+  {
+    $this->name     = $name;
+    $this->required = $required;
+  }
+
+  /**
+   * @param bool $b
+   * @return $this
+   */
+  public function setChecked($b)
+  {
+    $this->checked = $b;
+    return $this;
+  }
 
   /**
    * @return string
    */
   public function toString()
   {
-    // TODO: Implement toString() method.
+    $str = '';
+
+    $str .= '<div class="control-group"><div class="controls">';
+    $str .= '<label class="checkbox">';
+    $str .= '<input type="checkbox"> ' . $this->label;
+    $str .= '</label></div></div>';
+
+    return $str;
   }
 }

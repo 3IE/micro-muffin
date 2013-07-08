@@ -18,7 +18,7 @@ class FormGenerator
   /** @var string */
   private $method;
 
-  /** @var array */
+  /** @var Field[] */
   private $fields;
 
   /** @var bool */
@@ -30,10 +30,10 @@ class FormGenerator
    */
   public function __construct($action, $method = 'POST')
   {
-    $this->method = $method;
-    $this->action = $action;
+    $this->method      = $method;
+    $this->action      = $action;
     $this->isBootstrap = true;
-    $this->fields = array();
+    $this->fields      = array();
   }
 
   public function disableBootstrap()
@@ -45,31 +45,27 @@ class FormGenerator
    * @param string $name
    * @param string $type
    * @param int $required
-   * @param string $value
    * @return Input
    */
-  public function addInput($name, $type, $required = Field::FIELD_OPTIONAL, $value = null)
+  public function addInput($name, $type, $required = Field::FIELD_OPTIONAL)
   {
-    switch ($type)
-    {
-      case 'text':
-
-        break;
-
-      case 'password':
-
-        break;
-    }
+    $input          = new Input($name, $type, $required);
+    $this->fields[] = $input;
+    return $input;
   }
 
   /**
    * @param string $name
+   * @param string $label
    * @param int $required
-   * @param bool $checked
+   * @return Checkbox
    */
-  public function addCheckBox($name, $required = Field::FIELD_OPTIONAL, $checked = false)
+  public function addCheckBox($name, $label, $required = Field::FIELD_OPTIONAL)
   {
-
+    $checkbox = new Checkbox($name, $required);
+    $checkbox->setLabel($label);
+    $this->fields[] = $checkbox;
+    return $checkbox;
   }
 
   /**
