@@ -21,8 +21,11 @@ class FormGenerator
   /** @var Field[] */
   private $fields;
 
+  /** @var string */
+  private $legend;
+
   /** @var bool */
-  private $isBootstrap;
+  private $isHorizontal;
 
   /**
    * @param string $action
@@ -30,15 +33,27 @@ class FormGenerator
    */
   public function __construct($action, $method = 'POST')
   {
-    $this->method      = $method;
-    $this->action      = $action;
-    $this->isBootstrap = true;
-    $this->fields      = array();
+    $this->method       = $method;
+    $this->action       = $action;
+    $this->fields       = array();
+    $this->legend       = null;
+    $this->isHorizontal = true;
   }
 
-  public function disableBootstrap()
+  /**
+   * @param bool $b
+   */
+  public function setHorizontal($b)
   {
-    $this->isBootstrap = false;
+    $this->isHorizontal = $b;
+  }
+
+  /**
+   * @param string $legend
+   */
+  public function setLegend($legend)
+  {
+    $this->legend = $legend;
   }
 
   /**
@@ -88,7 +103,7 @@ class FormGenerator
    */
   public function addTextarea($name, $required = Field::FIELD_OPTIONAL)
   {
-    $textarea  = new Textarea($name, $required);
+    $textarea       = new Textarea($name, $required);
     $this->fields[] = $textarea;
     return $textarea;
   }
@@ -101,7 +116,7 @@ class FormGenerator
    */
   public function addRadio($name, Array $options, $required = Field::FIELD_OPTIONAL)
   {
-    $radio = new Radio($name, $options, $required);
+    $radio        = new Radio($name, $options, $required);
     $this->fields = $radio;
     return $radio;
   }
@@ -111,6 +126,21 @@ class FormGenerator
    */
   public function toString()
   {
+    $str        = '';
+    $horizontal = $this->isHorizontal ? ' class="form-horizontal" ' : null;
+    $str .= '<form action="' . $this->action . '" method="' . $this->method . '"' . $horizontal . '>';
 
+    if (!is_null($this->legend))
+      $str .= '<fieldset><legend>' . $this->legend . '</legend>';
+
+    foreach ($this->fields as $field)
+      $str .= $field->toString();
+
+
+    if (!is_null($this->legend))
+      $str .= '</fieldset>';
+
+    $str .= '</form>';
+    return $str;
   }
 }

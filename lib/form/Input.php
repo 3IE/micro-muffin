@@ -22,7 +22,6 @@ class Input extends Field
     'text',
     'hidden',
     'password',
-    'mail',
     'color',
     'date',
     'datetime',

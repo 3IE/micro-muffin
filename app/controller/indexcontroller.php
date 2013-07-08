@@ -11,6 +11,7 @@ class IndexController extends \Lib\Controller
 {
     public function index($params = array())
     {
+      /*
         $t = array();
         $t['name'] = 'b';
         $t['toto'] = 'bubububu';
@@ -38,5 +39,19 @@ class IndexController extends \Lib\Controller
 
         var_dump($v->check());
         var_dump($v->getMessages());
+      */
+
+      $f = new \Lib\Form\FormGenerator('/toto');
+      $f->addInput('login', 'text')
+        ->setLabel('Login')
+        ->setValue('Machin');
+      $f->addInput('password', 'password')
+        ->setLabel('Mot de passe');
+      $f->addInput('confirm', 'password')
+        ->setLabel('Confirmation mot de passe');
+      $f->addInput('mail', 'email')
+      ->setLabel('Adresse mail');
+      $f->setLegend('Enregistrement');
+      $this->set('form', $f->toString());
     }
 }
