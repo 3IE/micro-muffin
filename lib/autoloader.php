@@ -7,29 +7,40 @@
  * To change this template use File | Settings | File Templates.
  */
 
+namespace Lib;
+
 class Autoloader
 {
+  /** @var Autoloader */
+  private static $instance = null;
 
-  private static $include_path = array(
-    CONTROLLER_DIR,
-    MODEL_DIR,
-    TMODEL_DIR,
-    SPMODEL_DIR,
-    LIB_DIR,
-    LIBMODEL_DIR,
-    LIBFORM_DIR
-  );
+  /** @var array */
+  private static $include_path = array();
 
-  public function __construct()
+  /**
+   * @return Autoloader
+   */
+  public static function register()
+  {
+    new Autoloader();
+  }
+
+  private function __construct()
   {
     spl_autoload_register(array($this, 'loader'));
   }
 
+  /**
+   * @param string $p
+   */
   public static function addPath($p)
   {
     self::$include_path[] = $p;
   }
 
+  /**
+   * @param string $fullClassName
+   */
   private function loader($fullClassName)
   {
     $table     = explode('\\', $fullClassName);

@@ -6,6 +6,12 @@
  */
 
 /**
+ *
+ * DO NOT EDIT THIS GENERATION SCRIPT
+ * IT MAY BE OVERWRITEN BY UPDATING THE FRAMEWORK
+ * ONLY EXECUTE IT WITH A TERMINAL
+ *
+ *
  * HOW TO WRITE CUSTOM STORED PROCEDURE WITH MODEL
  * Execute a SQL query like this one :
  *
@@ -38,7 +44,7 @@ define('DISCLAIMER', "<?php
 /**
 * WARNING !
 * This is an auto-generated file. DO NOT EDIT IT !
-* It will be overwritten at the next database import.
+* It will be overwritten during the next database import.
 */
 \n");
 define('TAB', '  ');
@@ -46,6 +52,10 @@ define('SPMODELMATCH', '#^sp_[a-zA-Z0-9_]+$#');
 define('RO_CHMOD', 0440);
 define('W_CHMOD', 0660);
 
+/**
+ * @param $var
+ * @return bool
+ */
 function isTypeString($var)
 {
   $stringType = array(
