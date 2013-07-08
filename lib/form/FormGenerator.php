@@ -84,12 +84,13 @@ class FormGenerator
   /**
    * @param string $name
    * @param int $required
-   * @param string $value
    * @return Textarea
    */
-  public function addTextarea($name, $required = Field::FIELD_OPTIONAL, $value = null)
+  public function addTextarea($name, $required = Field::FIELD_OPTIONAL)
   {
-
+    $textarea  = new Textarea($name, $required);
+    $this->fields[] = $textarea;
+    return $textarea;
   }
 
   /**
