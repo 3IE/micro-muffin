@@ -97,12 +97,13 @@ class FormGenerator
    * @param string $name
    * @param array $options
    * @param int $required
-   * @param string $checked
    * @return Radio
    */
-  public function addRadio($name, Array $options, $required = Field::FIELD_OPTIONAL, $checked = null)
+  public function addRadio($name, Array $options, $required = Field::FIELD_OPTIONAL)
   {
-
+    $radio = new Radio($name, $options, $required);
+    $this->fields = $radio;
+    return $radio;
   }
 
   /**
