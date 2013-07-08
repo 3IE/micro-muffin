@@ -72,12 +72,13 @@ class FormGenerator
    * @param string $name
    * @param array $options
    * @param int $required
-   * @param string $selected
    * @return Select
    */
-  public function addSelect($name, Array $options, $required = Field::FIELD_OPTIONAL, $selected = null)
+  public function addSelect($name, Array $options, $required = Field::FIELD_OPTIONAL)
   {
-
+    $select         = new Select($name, $options, $required);
+    $this->fields[] = $select;
+    return $select;
   }
 
   /**
