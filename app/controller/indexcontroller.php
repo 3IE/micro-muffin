@@ -34,6 +34,7 @@ class IndexController extends \Lib\Controller
         $v->addRule('url2', array('url'));
         $v->addRule('url3', array('url'));
         $v->addRule('match', array('match:name'));
+        $v->addRule('gerger', array('required'));
 
         var_dump($v->check());
         var_dump($v->getMessages());
