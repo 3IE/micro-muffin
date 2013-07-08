@@ -16,12 +16,18 @@ class Autoloader
     TMODEL_DIR,
     SPMODEL_DIR,
     LIB_DIR,
-    LIBMODEL_DIR
+    LIBMODEL_DIR,
+    LIBFORM_DIR
   );
 
   public function __construct()
   {
     spl_autoload_register(array($this, 'loader'));
+  }
+
+  public static function addPath($p)
+  {
+    self::$include_path[] = $p;
   }
 
   private function loader($fullClassName)

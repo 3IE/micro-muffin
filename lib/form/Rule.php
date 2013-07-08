@@ -12,158 +12,159 @@ namespace Lib\Form;
 
 class Rule
 {
-    /** @var array */
-    private $source;
+  /** @var array */
+  private $source;
 
-    /** @var string */
-    private $name;
+  /** @var string */
+  private $name;
 
-    /** @var array */
-    private $constraints;
+  /** @var array */
+  private $constraints;
 
-    /** @var mixed */
-    private $var;
+  /** @var mixed */
+  private $var;
 
-    /**
-     * @param array $source
-     * @param string $name
-     * @param array $constraints
-     */
-    public function Rule(Array $source, $name, Array $constraints)
+  /**
+   * @param array $source
+   * @param string $name
+   * @param array $constraints
+   */
+  public function __construct(Array $source, $name, Array $constraints)
+  {
+    $this->source      = $source;
+    $this->name        = $name;
+    $this->constraints = $constraints;
+    $this->var         = array_key_exists($this->name, $this->source) ? $this->source[$this->name] : null;
+  }
+
+  /**
+   * @param array $messages
+   * @return bool
+   */
+  public function check(Array &$messages)
+  {
+    $pass = true;
+    foreach ($this->constraints as $constraint)
     {
-        $this->source = $source;
-        $this->name = $name;
-        $this->constraints = $constraints;
-        $this->var = array_key_exists($this->name, $this->source) ? $this->source[$this->name] : null;
-    }
+      $chunks    = explode(':', $constraint);
+      $function  = $chunks[0];
+      $parameter = count($chunks) > 1 ? $chunks[1] : null;
 
-    /**
-     * @param array $messages
-     * @return bool
-     */
-    public function check(Array &$messages)
-    {
-        $pass = true;
-        $messages[$this->name] = array();
-        foreach ($this->constraints as $constraint)
+      if (method_exists($this, $function))
+      {
+        //Check if there is a parameter
+        if (!is_null($parameter))
+          $ret = $this->$function($parameter);
+        else
+          $ret = $this->$function();
+
+        if (!is_bool($ret) || !$ret)
         {
-            $chunks = explode(':', $constraint);
-            $function = $chunks[0];
-            $parameter = count($chunks) > 1 ? $chunks[1] : null;
-
-            if (method_exists($this, $function))
-            {
-                //Check if there is a parameter
-                if (!is_null($parameter))
-                    $ret = $this->$function($parameter);
-                else
-                    $ret = $this->$function();
-
-                if (!is_bool($ret) || !$ret)
-                {
-                    $pass = false;
-                    $messages[$this->name][] = $ret;
-                }
-            }
+          if (!array_key_exists($this->name, $messages))
+            $messages[$this->name] = array();
+          $pass                    = false;
+          $messages[$this->name][] = $ret;
         }
-        return $pass;
+      }
     }
+    return $pass;
+  }
 
-    /**
-     * Checking methods
-     */
+  /**
+   * Checking methods
+   */
 
-    /**
-     * @return bool|string
-     */
-    private function required()
-    {
-        if (array_key_exists($this->name, $this->source))
-            return true;
-        else
-            return "Champ obligatoire";
-    }
+  /**
+   * @return bool|string
+   */
+  private function required()
+  {
+    if (array_key_exists($this->name, $this->source))
+      return true;
+    else
+      return "Champ obligatoire";
+  }
 
-    /**
-     * @param int $n
-     * @return bool|string
-     */
-    private function min($n)
-    {
-        if (strlen($this->var) >= $n)
-            return true;
-        else
-            return "Champ trop court, " . $n . " charactères minimun";
-    }
+  /**
+   * @param int $n
+   * @return bool|string
+   */
+  private function min($n)
+  {
+    if (strlen($this->var) >= $n)
+      return true;
+    else
+      return "Champ trop court, " . $n . " charactères minimun";
+  }
 
-    /**
-     * @param int $n
-     * @return bool|string
-     */
-    private function max($n)
-    {
-        if (strlen($this->var) <= $n)
-            return true;
-        else
-            return "Champ trop long, " . $n . " charactères maximum";
-    }
+  /**
+   * @param int $n
+   * @return bool|string
+   */
+  private function max($n)
+  {
+    if (strlen($this->var) <= $n)
+      return true;
+    else
+      return "Champ trop long, " . $n . " charactères maximum";
+  }
 
-    /**
-     * @param $filter
-     * @return bool
-     */
-    private function checkFilter($filter)
-    {
-        $ret = filter_var($this->var, $filter);
+  /**
+   * @param $filter
+   * @return bool
+   */
+  private function checkFilter($filter)
+  {
+    $ret = filter_var($this->var, $filter);
 
-        if (is_bool($ret) && $ret === false)
-            return false;
-        else
-            return true;
-    }
+    if (is_bool($ret) && $ret === false)
+      return false;
+    else
+      return true;
+  }
 
-    /**
-     * @return bool|string
-     */
-    private function mail()
-    {
-        if ($this->checkFilter(FILTER_VALIDATE_EMAIL))
-            return true;
-        else
-            return "Adresse mail invalide";
-    }
+  /**
+   * @return bool|string
+   */
+  private function mail()
+  {
+    if ($this->checkFilter(FILTER_VALIDATE_EMAIL))
+      return true;
+    else
+      return "Adresse mail invalide";
+  }
 
-    /**
-     * @return bool|string
-     */
-    private function url()
-    {
-        if ($this->checkFilter(FILTER_VALIDATE_URL))
-            return true;
-        else
-            return "URL invalide";
-    }
+  /**
+   * @return bool|string
+   */
+  private function url()
+  {
+    if ($this->checkFilter(FILTER_VALIDATE_URL))
+      return true;
+    else
+      return "URL invalide";
+  }
 
-    /**
-     * @return bool|string
-     */
-    private function numeric()
-    {
-        if (is_numeric($this->var))
-            return true;
-        else
-            return "Nombre invalide";
-    }
+  /**
+   * @return bool|string
+   */
+  private function numeric()
+  {
+    if (is_numeric($this->var))
+      return true;
+    else
+      return "Nombre invalide";
+  }
 
-    /**
-     * @param $field
-     * @return bool|string
-     */
-    private function match($field)
-    {
-        if (array_key_exists($field, $this->source) && $this->source[$field] == $this->var)
-            return true;
-        else
-            return "Ne correspond pas à " . $field;
-    }
+  /**
+   * @param $field
+   * @return bool|string
+   */
+  private function match($field)
+  {
+    if (array_key_exists($field, $this->source) && $this->source[$field] == $this->var)
+      return true;
+    else
+      return "Ne correspond pas à " . $field;
+  }
 }

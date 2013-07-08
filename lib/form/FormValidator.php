@@ -11,67 +11,53 @@ namespace Lib\Form;
 
 class FormValidator
 {
-    /** @var array */
-    private $source;
+  /** @var array */
+  private $source;
 
-    /** @var Rule[] */
-    private $rules;
+  /** @var Rule[] */
+  private $rules;
 
-    /** @var array */
-    private $messages;
+  /** @var array */
+  private $messages;
 
-    /**
-     * @param array $source
-     */
-    public function FormValidator(Array $source)
-    {
-        $this->source = $source;
+  /**
+   * @param array $source
+   */
+  public function __construct(Array $source)
+  {
+    $this->rules    = array();
+    $this->messages = array();
+    $this->source   = $source;
+  }
+
+  /**
+   * @param string $name
+   * @param array $constraints
+   */
+  public function addRule($name, Array $constraints)
+  {
+    $this->rules[] = new Rule($this->source, $name, $constraints);
+  }
+
+  /**
+   * @return bool
+   */
+  public function check()
+  {
+    $pass = true;
+    foreach ($this->rules as $rule) {
+      $ret = $rule->check($this->messages);
+      if (!is_bool($ret) || !$ret)
+        $pass = false;
     }
+    return $pass;
+  }
 
-    /**
-     * @param string $name
-     * @param array $constraints
-     */
-    public function addRule($name, Array $constraints)
-    {
-        $this->rules[] = new Rule($name, $constraints);
-    }
-
-    /**
-     * @return bool
-     */
-    public function check()
-    {
-        $pass = true;
-        foreach ($this->rules as $rule)
-        {
-            $ret = $rule->check($this->messages);
-            if (!is_bool($ret) || !$ret)
-                $pass = false;
-        }
-        return $pass;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMessages()
-    {
-        return $this->messages;
-    }
-
-    public function example()
-    {
-        $validator = new FormValidator($_POST);
-        $validator->addRule('login', array('min:3', 'max:255', 'required'));
-
-        if ($validator->check())
-        {
-
-        }
-        else
-        {
-            $errors = $validator->getMessages();
-        }
-    }
+  /**
+   * @return array
+   */
+  public function getMessages()
+  {
+    return $this->messages;
+  }
 }

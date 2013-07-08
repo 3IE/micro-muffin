@@ -25,3 +25,4 @@ define('CONFIG_DIR', BASE_DIR . 'config/');
 define('VENDORS_DIR', BASE_DIR . 'vendors/');
 define('LIB_DIR', BASE_DIR . 'lib/');
 define('LIBMODEL_DIR', BASE_DIR . 'lib/models/');
+define('LIBFORM_DIR', BASE_DIR . 'lib/form/');
