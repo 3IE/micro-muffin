@@ -27,6 +27,9 @@ class FormGenerator
   /** @var bool */
   private $isHorizontal;
 
+  /** @var string */
+  private $submitLabel;
+
   /**
    * @param string $action
    * @param string $method
@@ -38,6 +41,15 @@ class FormGenerator
     $this->fields       = array();
     $this->legend       = null;
     $this->isHorizontal = true;
+    $this->submitLabel  = 'Valider';
+  }
+
+  /**
+   * @param string $s
+   */
+  public function setSubmitLabel($s)
+  {
+    $this->submitLabel = $s;
   }
 
   /**
@@ -143,6 +155,9 @@ class FormGenerator
 
     if (!is_null($this->legend))
       $str .= '</fieldset>';
+
+
+    $str .= '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">'.$this->submitLabel.'</button></div></div>';
 
     if ($requiredFields)
       $str .= '<div><div class="control-group"><div class="controls">' . Field::requiredStarToString() . ' champs obligatoires</div></div></div>';
