@@ -37,4 +37,25 @@ abstract class Field
     $this->label = $label;
     return $this;
   }
+
+  public function setRequired()
+  {
+    $this->required = self::FIELD_REQUIRED;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isRequired()
+  {
+    return $this->required == self::FIELD_REQUIRED;
+  }
+
+  /**
+   * @return string
+   */
+  protected function requiredStarToString()
+  {
+    return '<span style="color:red;">*</span>';
+  }
 }

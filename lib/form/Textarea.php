@@ -14,15 +14,52 @@ class Textarea extends Field
   /** @var string */
   private $value;
 
+  /** @var string */
+  private $placeholder;
+
   /**
    * @param string $name
    * @param int $required
    */
   public function __construct($name, $required)
   {
-    $this->name = $name;
-    $this->required = $required;
-    $this->value = null;
+    $this->name        = $name;
+    $this->required    = $required;
+    $this->value       = null;
+    $this->placeholder = null;
+  }
+
+  /**
+   * @param string $s
+   */
+  public function setPlaceholder($s)
+  {
+    $this->placeholder = $s;
+  }
+
+  /**
+   * @return null|string
+   */
+  private function getPlaceholder()
+  {
+    if (!is_null($this->placeholder))
+      return $this->placeholder;
+    else if (!is_null($this->label))
+      return $this->label;
+    else
+      return null;
+  }
+
+  /**
+   * @return null|string
+   */
+  private function placeholderToString()
+  {
+    $placeholder = $this->getPlaceholder();
+    if (!is_null($placeholder))
+      return 'placeholder="' . $placeholder . '"';
+    else
+      return null;
   }
 
   /**
@@ -55,7 +92,7 @@ class Textarea extends Field
     }
 
     $str .= '<div class="controls" >';
-    $str .= '<textarea placeholder="' . $nameUp . '" name="' . $this->name . '" id="' . $this->name . '">' . $value . '</textarea>';
+    $str .= '<textarea ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $value . '</textarea>';
     $str .= '</div>
         </div> ';
 

@@ -17,6 +17,9 @@ class Input extends Field
   /** @var string */
   private $value;
 
+  /** @var string */
+  private $placeholder;
+
   /** @var array */
   private $recognizedTypes = array(
     'text',
@@ -44,10 +47,45 @@ class Input extends Field
    */
   public function __construct($name, $type, $required)
   {
-    $this->name     = $name;
-    $this->type     = $type;
-    $this->required = $required;
-    $this->value    = null;
+    $this->name        = $name;
+    $this->type        = $type;
+    $this->required    = $required;
+    $this->value       = null;
+    $this->placeholder = null;
+    $this->label       = null;
+  }
+
+  /**
+   * @param string $s
+   */
+  public function setPlaceholder($s)
+  {
+    $this->placeholder = $s;
+  }
+
+  /**
+   * @return null|string
+   */
+  private function getPlaceholder()
+  {
+    if (!is_null($this->placeholder))
+      return $this->placeholder;
+    else if (!is_null($this->label))
+      return $this->label;
+    else
+      return null;
+  }
+
+  /**
+   * @return null|string
+   */
+  private function placeholderToString()
+  {
+    $placeholder = $this->getPlaceholder();
+    if (!is_null($placeholder))
+      return 'placeholder="' . $placeholder . '"';
+    else
+      return null;
   }
 
   /**
@@ -78,10 +116,11 @@ class Input extends Field
    */
   public function toString()
   {
-    $str       = '';
-    $nameUp    = $this->name;
-    $nameUp[0] = strtoupper($nameUp[0]);
-    $value     = !is_null($this->value) ? ' value="' . $this->value . '" ' : null;
+    $str         = '';
+    $placeholder = null;
+    $nameUp      = $this->name;
+    $nameUp[0]   = strtoupper($nameUp[0]);
+    $value       = !is_null($this->value) ? ' value="' . $this->value . '" ' : null;
 
     $str .= '<div class="control-group">';
 
@@ -93,7 +132,7 @@ class Input extends Field
     }
 
     $str .= '<div class="controls" >';
-    $str .= '<input type="' . $this->type . '" placeholder="' . $nameUp . '" name="' . $this->name . '" id="' . $this->name . '"' . $value . ' />';
+    $str .= '<input type="' . $this->type . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '"' . $value . ' />';
     $str .= '</div>
         </div> ';
 

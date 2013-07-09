@@ -116,8 +116,8 @@ class FormGenerator
    */
   public function addRadio($name, Array $options, $required = Field::FIELD_OPTIONAL)
   {
-    $radio        = new Radio($name, $options, $required);
-    $this->fields = $radio;
+    $radio          = new Radio($name, $options, $required);
+    $this->fields[] = $radio;
     return $radio;
   }
 
@@ -126,16 +126,20 @@ class FormGenerator
    */
   public function toString()
   {
-    $str        = '';
-    $horizontal = $this->isHorizontal ? ' class="form-horizontal" ' : null;
+    $requiredFields = false;
+    $str            = '';
+    $horizontal     = $this->isHorizontal ? ' class="form-horizontal" ' : null;
+
     $str .= '<form action="' . $this->action . '" method="' . $this->method . '"' . $horizontal . '>';
 
     if (!is_null($this->legend))
       $str .= '<fieldset><legend>' . $this->legend . '</legend>';
 
     foreach ($this->fields as $field)
+    {
+      $requiredFields = $requiredFields || $field->isRequired();
       $str .= $field->toString();
-
+    }
 
     if (!is_null($this->legend))
       $str .= '</fieldset>';
