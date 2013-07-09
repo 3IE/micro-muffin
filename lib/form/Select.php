@@ -69,7 +69,9 @@ class Select extends Field
       else
         $str .= '<option value="' . $k . '">' . $v . '</option>';
     }
-    $str .= '</select></div></div>';
+    $str .= '</select> ';
+    $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
+    $str .= '</div></div>';
 
     return $str;
   }

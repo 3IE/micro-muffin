@@ -92,7 +92,8 @@ class Textarea extends Field
     }
 
     $str .= '<div class="controls" >';
-    $str .= '<textarea ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $value . '</textarea>';
+    $str .= '<textarea ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $value . '</textarea> ';
+    $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
     $str .= '</div>
         </div> ';
 

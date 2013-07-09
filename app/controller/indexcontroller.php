@@ -44,7 +44,8 @@ class IndexController extends \Lib\Controller
     $f = new \Lib\Form\FormGenerator('/toto');
     $f->addInput('login', 'text')
         ->setLabel('Login')
-        ->setValue('Machin');
+        ->setValue('Machin')
+        ->setRequired();
     $f->addInput('password', 'password')
         ->setLabel('Mot de passe');
     $f->addInput('confirm', 'password')
@@ -53,11 +54,14 @@ class IndexController extends \Lib\Controller
         ->setLabel('Adresse mail');
     $f->setLegend('Enregistrement');
     $f->addSelect('pays', array('fr' => 'France', 'us' => 'Etats-Unis', 'en' => 'Roayume-Uni'))
-        ->setLabel("Parys");
-    $f->addRadio('pays', array('fr' => 'France', 'us' => 'Etats-Unis', 'en' => 'Roayume-Uni'));
+        ->setLabel("Parys")
+        ->setRequired();
+    $f->addRadio('pays', array('fr' => 'France', 'us' => 'Etats-Unis', 'en' => 'Roayume-Uni'))
+        ->setRequired();
     $f->addCheckBox('notif', 'Recevoir les notifications');
     $f->addTextarea('comment')
-      ->setLabel("Commentaire");
+        ->setLabel("Commentaire")
+        ->setRequired();
     $this->set('form', $f->toString());
   }
 }

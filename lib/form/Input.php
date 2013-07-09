@@ -132,7 +132,8 @@ class Input extends Field
     }
 
     $str .= '<div class="controls" >';
-    $str .= '<input type="' . $this->type . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '"' . $value . ' />';
+    $str .= '<input type="' . $this->type . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '"' . $value . ' /> ';
+    $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
     $str .= '</div>
         </div> ';
 

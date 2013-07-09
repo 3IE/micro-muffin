@@ -144,6 +144,9 @@ class FormGenerator
     if (!is_null($this->legend))
       $str .= '</fieldset>';
 
+    if ($requiredFields)
+      $str .= '<div><div class="control-group"><div class="controls">' . Field::requiredStarToString() . ' champs obligatoires</div></div></div>';
+
     $str .= '</form>';
     return $str;
   }

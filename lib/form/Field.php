@@ -54,7 +54,7 @@ abstract class Field
   /**
    * @return string
    */
-  protected function requiredStarToString()
+  public static function requiredStarToString()
   {
     return '<span style="color:red;">*</span>';
   }
