@@ -48,11 +48,12 @@ class Input extends Field
   public function __construct($name, $type, $required)
   {
     $this->name        = $name;
-    $this->type        = $type;
     $this->required    = $required;
     $this->value       = null;
     $this->placeholder = null;
     $this->label       = null;
+    
+    $this->setType($type);
   }
 
   /**
