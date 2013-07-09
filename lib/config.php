@@ -21,13 +21,16 @@ define('LIB_DIR', BASE_DIR . 'lib/');
 define('LIBMODEL_DIR', BASE_DIR . 'lib/models/');
 define('LIBFORM_DIR', BASE_DIR . 'lib/form/');
 
-Autoloader::addPath(CONTROLLER_DIR);
-Autoloader::addPath(VIEW_DIR);
-Autoloader::addPath(MODEL_DIR);
-Autoloader::addPath(TMODEL_DIR);
-Autoloader::addPath(SPMODEL_DIR);
-Autoloader::addPath(CONFIG_DIR);
-Autoloader::addPath(VENDORS_DIR);
-Autoloader::addPath(LIB_DIR);
-Autoloader::addPath(LIBMODEL_DIR);
-Autoloader::addPath(LIBFORM_DIR);
+if (!defined('NOAUTOLOAD') || !NOAUTOLOAD)
+{
+  Autoloader::addPath(CONTROLLER_DIR);
+  Autoloader::addPath(VIEW_DIR);
+  Autoloader::addPath(MODEL_DIR);
+  Autoloader::addPath(TMODEL_DIR);
+  Autoloader::addPath(SPMODEL_DIR);
+  Autoloader::addPath(CONFIG_DIR);
+  Autoloader::addPath(VENDORS_DIR);
+  Autoloader::addPath(LIB_DIR);
+  Autoloader::addPath(LIBMODEL_DIR);
+  Autoloader::addPath(LIBFORM_DIR);
+}

@@ -33,6 +33,8 @@
  * Naming convention : sp_NAME()
  */
 
+define('NOAUTOLOAD', true);
+
 require_once 'config.php';
 require_once '../lib/pdos.php';
 require_once '../lib/epo.php';
