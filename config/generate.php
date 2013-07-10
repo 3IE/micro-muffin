@@ -515,7 +515,10 @@ function writeSP_record(Array $sp)
 
     //Execute function
     $buffer .= TAB . "/**\n";
-    $buffer .= TAB . " * @return " . $className . "[]\n";
+    if ($sp['return_type'] != 'record')
+      $buffer .= TAB . " * @return array\n";
+    else
+      $buffer .= TAB . " * @return " . $className . "[]\n";
     $buffer .= TAB . " */\n";
     $buffer .= TAB . 'public static function ' . $prototype . "\n";
     $buffer .= TAB . "{\n";
