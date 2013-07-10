@@ -44,14 +44,14 @@ class FormGenerator
     $this->submitLabel  = 'Valider';
   }
 
-  public function fillErrors(Array $errors)
+  public function fillErrors(Array &$errors)
   {
     foreach ($errors as $err => $array)
     {
       if (array_key_exists($err, $this->fields))
         $this->fields[$err]->setErrors($array);
     }
-
+    unset($errors);
   }
 
   /**
