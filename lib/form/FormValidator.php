@@ -54,6 +54,15 @@ class FormValidator
   }
 
   /**
+   * @param string $inputName
+   * @param string $message
+   */
+  public function addMessage($inputName, $message)
+  {
+    $this->messages[$inputName][] = $message;
+  }
+
+  /**
    * @return array
    */
   public function getMessages()

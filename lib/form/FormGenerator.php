@@ -30,6 +30,9 @@ class FormGenerator
   /** @var string */
   private $submitLabel;
 
+  /** @var string */
+  private $formError;
+
   /**
    * @param string $action
    * @param string $method
@@ -41,17 +44,26 @@ class FormGenerator
     $this->fields       = array();
     $this->legend       = null;
     $this->isHorizontal = true;
+    $this->formError    = null;
     $this->submitLabel  = 'Valider';
   }
 
   public function fillErrors(Array &$errors)
   {
-    foreach ($errors as $err => $array)
+    if (!is_null($errors))
     {
-      if (array_key_exists($err, $this->fields))
-        $this->fields[$err]->setErrors($array);
+      foreach ($errors as $err => $array)
+      {
+        if ($err == '_form')
+          $this->formError = $array;
+        else
+        {
+          if (array_key_exists($err, $this->fields))
+            $this->fields[$err]->setErrors($array);
+        }
+      }
+      $errors = null;
     }
-    unset($errors);
   }
 
   /**
@@ -156,6 +168,16 @@ class FormGenerator
 
     if (!is_null($this->legend))
       $str .= '<fieldset><legend>' . $this->legend . '</legend>';
+
+    if (!is_null($this->formError) && count($this->formError) > 0)
+    {
+      $str .= '<div class="alert alert-error">';
+      foreach ($this->formError as $error)
+      {
+        $str .= '<div>' . $error . '</div>';
+      }
+      $str .= '</div>';
+    }
 
     foreach ($this->fields as $field)
     {
