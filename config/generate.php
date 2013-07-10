@@ -432,6 +432,126 @@ function writeCountProcedure(\Lib\EPO &$pdo, $tableName)
   $pdo->commit();
 }
 
+function writeSP_record(Array $sp)
+{
+  $name         = substr($sp['name'], 3);
+  $fileName     = 'sp_' . $name . '.php';
+  $className    = 'SP_' . $name;
+  $className[3] = strtoupper($className[3]);
+  $filepath     = THIS_SP_MODEL_DIR . $fileName;
+
+  $file = fopen($filepath, 'w');
+
+  if ($file)
+  {
+
+    $buffer = '';
+
+    $buffer .= DISCLAIMER;
+    $buffer .= 'class ' . $className . " extends \\Lib\\Models\\Model\n{\n";
+
+    //Writing class fields (OUT parameters)
+    if (count($sp['parameters']) > 0)
+    {
+      foreach ($sp['parameters'] as $p)
+      {
+        if ($p['mode'] == 'OUT' || $p['mode'] == 'INOUT')
+        {
+          $nameUppered    = $p['name'];
+          $nameUppered[0] = strtoupper($nameUppered[0]);
+
+          //Field
+          $buffer .= TAB . "protected \$" . $p['name'] . ";\n\n";
+
+          //Getter
+          $buffer .= TAB . "public function get" . $nameUppered . "()\n";
+          $buffer .= TAB . "{\n";
+          $buffer .= TAB . TAB . "return \$this->" . $p['name'] . ";\n";
+          $buffer .= TAB . "}\n\n";
+
+          //Setter
+          $buffer .= TAB . "protected function set" . $nameUppered . "(\$" . $p['name'] . ")\n";
+          $buffer .= TAB . "{\n";
+          $buffer .= TAB . TAB . "\$this->" . $p['name'] . " = \$" . $p['name'] . ";\n";
+          $buffer .= TAB . "}\n\n";
+        }
+      }
+    }
+
+    $prototype = 'execute(';
+    $query     = 'SELECT * FROM ' . $sp['name'] . '(';
+
+    if (count($sp['parameters']) > 0)
+    {
+      $in_params = false;
+      foreach ($sp['parameters'] as $p)
+      {
+        if ($p['mode'] == 'IN' || $p['mode'] == 'INOUT')
+        {
+          $in_params = true;
+          $prototype .= '$' . $p['name'] . ', ';
+          if (isTypeString($p['type']))
+            $query .= '\\\'\'.$' . $p['name'] . '.\'\\\', ';
+          else
+            $query .= '\'.$' . $p['name'] . '.\', ';
+        }
+      }
+      if ($in_params)
+      {
+        $prototype = substr($prototype, 0, -2) . ')';
+        $query     = substr($query, 0, -2) . ')';
+      }
+      else
+      {
+        $prototype .= ')';
+        $query .= ')';
+      }
+    }
+    else
+    {
+      $prototype .= ')';
+      $query .= ')';
+    }
+
+    //Execute function
+    $buffer .= TAB . "/**\n";
+    $buffer .= TAB . " * @return " . $className . "[]\n";
+    $buffer .= TAB . " */\n";
+    $buffer .= TAB . 'public static function ' . $prototype . "\n";
+    $buffer .= TAB . "{\n";
+    $buffer .= TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
+    $buffer .= TAB . TAB . "\$query = \$pdo->prepare('" . $query . "');\n";
+    $buffer .= TAB . TAB . "\$query->execute();\n";
+    $buffer .= TAB . TAB . "\$res = array();\n";
+
+    if ($sp['return_type'] == 'record')
+    {
+      $buffer .= TAB . TAB . "foreach(\$query->fetchAll() as \$v)\n";
+      $buffer .= TAB . TAB . "{\n";
+      $buffer .= TAB . TAB . TAB . "\$obj = new " . $className . "();\n";
+      $buffer .= TAB . TAB . TAB . "self::hydrate(\$obj, \$v);\n";
+      $buffer .= TAB . TAB . TAB . "\$res[] = \$obj;\n";
+      $buffer .= TAB . TAB . "}\n";
+    }
+    else
+    {
+      $buffer .= TAB . TAB . "foreach(\$query->fetchAll(PDO::FETCH_COLUMN) as \$v)\n";
+      $buffer .= TAB . TAB . TAB . "\$res[] = \$v;\n";
+    }
+
+    $buffer .= TAB . TAB . "return \$res;\n";
+    $buffer .= TAB . "}\n\n";
+
+    $buffer .= "}\n";
+
+    fwrite($file, $buffer);
+    fclose($file);
+
+    chmod($filepath, RO_CHMOD);
+    writeLine(" " . $className . " model written");
+  }
+}
+
 /**
  * @param array $storedProcedures
  */
@@ -443,112 +563,7 @@ function createSP_Models(Array $storedProcedures)
     {
       if (preg_match(SPMODELMATCH, $sp['name']))
       {
-        $name         = substr($sp['name'], 3);
-        $fileName     = 'sp_' . $name . '.php';
-        $className    = 'SP_' . $name;
-        $className[3] = strtoupper($className[3]);
-        $filepath     = THIS_SP_MODEL_DIR . $fileName;
-
-        $file = fopen($filepath, 'w');
-
-        if ($file)
-        {
-
-          $buffer = '';
-
-          $buffer .= DISCLAIMER;
-          $buffer .= 'class ' . $className . " extends \\Lib\\Models\\Model\n{\n";
-
-          //Writing class fields (OUT parameters)
-          if (count($sp['parameters']) > 0)
-          {
-            foreach ($sp['parameters'] as $p)
-            {
-              if ($p['mode'] == 'OUT' || $p['mode'] == 'INOUT')
-              {
-                $nameUppered    = $p['name'];
-                $nameUppered[0] = strtoupper($nameUppered[0]);
-
-                //Field
-                $buffer .= TAB . "protected \$" . $p['name'] . ";\n\n";
-
-                //Getter
-                $buffer .= TAB . "public function get" . $nameUppered . "()\n";
-                $buffer .= TAB . "{\n";
-                $buffer .= TAB . TAB . "return \$this->" . $p['name'] . ";\n";
-                $buffer .= TAB . "}\n\n";
-
-                //Setter
-                $buffer .= TAB . "protected function set" . $nameUppered . "(\$" . $p['name'] . ")\n";
-                $buffer .= TAB . "{\n";
-                $buffer .= TAB . TAB . "\$this->" . $p['name'] . " = \$" . $p['name'] . ";\n";
-                $buffer .= TAB . "}\n\n";
-              }
-            }
-          }
-
-          $prototype = 'execute(';
-          $query     = 'SELECT * FROM ' . $sp['name'] . '(';
-
-          if (count($sp['parameters']) > 0)
-          {
-            $in_params = false;
-            foreach ($sp['parameters'] as $p)
-            {
-              if ($p['mode'] == 'IN' || $p['mode'] == 'INOUT')
-              {
-                $in_params = true;
-                $prototype .= '$' . $p['name'] . ', ';
-                if (isTypeString($p['type']))
-                  $query .= '\\\'\'.$' . $p['name'] . '.\'\\\', ';
-                else
-                  $query .= '\'.$' . $p['name'] . '.\', ';
-              }
-            }
-            if ($in_params)
-            {
-              $prototype = substr($prototype, 0, -2) . ')';
-              $query     = substr($query, 0, -2) . ')';
-            }
-            else
-            {
-              $prototype .= ')';
-              $query .= ')';
-            }
-          }
-          else
-          {
-            $prototype .= ')';
-            $query .= ')';
-          }
-
-          //Execute function
-          $buffer .= TAB . "/**\n";
-          $buffer .= TAB . " * @return " . $className . "[]\n";
-          $buffer .= TAB . " */\n";
-          $buffer .= TAB . 'public static function ' . $prototype . "\n";
-          $buffer .= TAB . "{\n";
-          $buffer .= TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
-          $buffer .= TAB . TAB . "\$query = \$pdo->prepare('" . $query . "');\n";
-          $buffer .= TAB . TAB . "\$query->execute();\n";
-          $buffer .= TAB . TAB . "\$res = array();\n";
-          $buffer .= TAB . TAB . "foreach(\$query->fetchAll() as \$v)\n";
-          $buffer .= TAB . TAB . "{\n";
-          $buffer .= TAB . TAB . TAB . "\$obj = new " . $className . "();\n";
-          $buffer .= TAB . TAB . TAB . "self::hydrate(\$obj, \$v);\n";
-          $buffer .= TAB . TAB . TAB . "\$res[] = \$obj;\n";
-          $buffer .= TAB . TAB . "}\n";
-          $buffer .= TAB . TAB . "return \$res;\n";
-          $buffer .= TAB . "}\n\n";
-
-          $buffer .= "}\n";
-
-          fwrite($file, $buffer);
-          fclose($file);
-
-          chmod($filepath, RO_CHMOD);
-          writeLine(" " . $className . " model written");
-        }
+        writeSP_record($sp);
       }
     }
   }
