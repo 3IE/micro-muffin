@@ -21,4 +21,15 @@ class Tools
   {
     return isset($_GET[$name]) ? $_GET[$name] : $default;
   }
+
+  /**
+   * @param string $str
+   * @return string
+   */
+  public static function capitalize($str)
+  {
+    $up = $str;
+    $up[0] = strtoupper($up[0]);
+    return $up;
+  }
 }

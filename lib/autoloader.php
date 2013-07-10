@@ -51,6 +51,8 @@ class Autoloader
     {
       if (file_exists($base_dir . $path . $className . '.php'))
         require_once $base_dir . $path . $className . '.php';
+      else if (file_exists($base_dir . $path . Tools::capitalize($className) . '.php'))
+        require_once $base_dir . $path . Tools::capitalize($className) . '.php';
       else if (file_exists($base_dir . $path . strtolower($className) . '.php'))
         require_once $base_dir . $path . strtolower($className) . '.php';
     }
