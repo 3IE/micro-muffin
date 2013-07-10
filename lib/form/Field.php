@@ -23,6 +23,25 @@ abstract class Field
   /** @var string|null */
   protected $label;
 
+  /** @var array */
+  protected $errors;
+
+  /**
+   * @param array $errors
+   */
+  public function setErrors(Array $errors)
+  {
+    $this->errors = $errors;
+  }
+
+  /**
+   * @param string $error
+   */
+  public function addError($error)
+  {
+    $this->errors[] = $error;
+  }
+
   /**
    * @return string
    */

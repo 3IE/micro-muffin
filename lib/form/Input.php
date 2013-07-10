@@ -47,12 +47,12 @@ class Input extends Field
    */
   public function __construct($name, $type, $required)
   {
-    $this->name        = $name;
-    $this->required    = $required;
-    $this->value       = null;
+    $this->name = $name;
+    $this->required = $required;
+    $this->value = null;
     $this->placeholder = null;
-    $this->label       = null;
-    
+    $this->label = null;
+
     $this->setType($type);
   }
 
@@ -117,17 +117,20 @@ class Input extends Field
    */
   public function toString()
   {
-    $str         = '';
+    $str = '';
     $placeholder = null;
-    $nameUp      = $this->name;
-    $nameUp[0]   = strtoupper($nameUp[0]);
-    $value       = !is_null($this->value) ? ' value="' . $this->value . '" ' : null;
+    $nameUp = $this->name;
+    $nameUp[0] = strtoupper($nameUp[0]);
+    $value = !is_null($this->value) ? ' value="' . $this->value . '" ' : null;
 
-    $str .= '<div class="control-group">';
+    if (count($this->errors) > 0)
+      $str .= '<div class="control-group error">';
+    else
+      $str .= '<div class="control-group">';
 
     if ($this->label != null)
     {
-      $labelUp    = $this->label;
+      $labelUp = $this->label;
       $labelUp[0] = strtoupper($labelUp[0]);
       $str .= '<label for="' . $this->name . '" class="control-label">' . $labelUp . ' :</label>';
     }
@@ -135,6 +138,16 @@ class Input extends Field
     $str .= '<div class="controls" >';
     $str .= '<input type="' . $this->type . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '"' . $value . ' /> ';
     $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
+
+    if (count($this->errors) > 0)
+    {
+      $str .= '<span class="help-inline"> ';
+      foreach ($this->errors as $e)
+        $str .= $e . ', ';
+      $str = substr($str, 0, -2);
+      $str .= '</span>';
+    }
+
     $str .= '</div>
         </div> ';
 

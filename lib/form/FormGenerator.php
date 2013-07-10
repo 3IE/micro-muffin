@@ -44,6 +44,16 @@ class FormGenerator
     $this->submitLabel  = 'Valider';
   }
 
+  public function fillErrors(Array $errors)
+  {
+    foreach ($errors as $err => $array)
+    {
+      if (array_key_exists($err, $this->fields))
+        $this->fields[$err]->setErrors($array);
+    }
+
+  }
+
   /**
    * @param string $s
    */
@@ -76,8 +86,8 @@ class FormGenerator
    */
   public function addInput($name, $type, $required = Field::FIELD_OPTIONAL)
   {
-    $input          = new Input($name, $type, $required);
-    $this->fields[] = $input;
+    $input               = new Input($name, $type, $required);
+    $this->fields[$name] = $input;
     return $input;
   }
 
@@ -91,7 +101,7 @@ class FormGenerator
   {
     $checkbox = new Checkbox($name, $required);
     $checkbox->setLabel($label);
-    $this->fields[] = $checkbox;
+    $this->fields[$name] = $checkbox;
     return $checkbox;
   }
 
@@ -103,8 +113,8 @@ class FormGenerator
    */
   public function addSelect($name, Array $options, $required = Field::FIELD_OPTIONAL)
   {
-    $select         = new Select($name, $options, $required);
-    $this->fields[] = $select;
+    $select              = new Select($name, $options, $required);
+    $this->fields[$name] = $select;
     return $select;
   }
 
@@ -115,8 +125,8 @@ class FormGenerator
    */
   public function addTextarea($name, $required = Field::FIELD_OPTIONAL)
   {
-    $textarea       = new Textarea($name, $required);
-    $this->fields[] = $textarea;
+    $textarea            = new Textarea($name, $required);
+    $this->fields[$name] = $textarea;
     return $textarea;
   }
 
@@ -128,8 +138,8 @@ class FormGenerator
    */
   public function addRadio($name, Array $options, $required = Field::FIELD_OPTIONAL)
   {
-    $radio          = new Radio($name, $options, $required);
-    $this->fields[] = $radio;
+    $radio               = new Radio($name, $options, $required);
+    $this->fields[$name] = $radio;
     return $radio;
   }
 
@@ -157,7 +167,7 @@ class FormGenerator
       $str .= '</fieldset>';
 
 
-    $str .= '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">'.$this->submitLabel.'</button></div></div>';
+    $str .= '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">' . $this->submitLabel . '</button></div></div>';
 
     if ($requiredFields)
       $str .= '<div><div class="control-group"><div class="controls">' . Field::requiredStarToString() . ' champs obligatoires</div></div></div>';

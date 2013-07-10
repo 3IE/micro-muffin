@@ -82,7 +82,10 @@ class Textarea extends Field
     $nameUp[0] = strtoupper($nameUp[0]);
     $value     = !is_null($this->value) ? ' value="' . $this->value . '" ' : null;
 
-    $str .= '<div class="control-group">';
+    if (count($this->errors) > 0)
+      $str .= '<div class="control-group error">';
+    else
+      $str .= '<div class="control-group">';
 
     if ($this->label != null)
     {
@@ -94,6 +97,16 @@ class Textarea extends Field
     $str .= '<div class="controls" >';
     $str .= '<textarea ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $value . '</textarea> ';
     $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
+
+    if (count($this->errors) > 0)
+    {
+      $str .= '<span class="help-inline"> ';
+      foreach ($this->errors as $e)
+        $str .= $e . ', ';
+      $str = substr($str, 0, -2);
+      $str .= '</span>';
+    }
+
     $str .= '</div>
         </div> ';
 

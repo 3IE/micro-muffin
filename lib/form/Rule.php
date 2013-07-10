@@ -34,7 +34,7 @@ class Rule
     $this->source      = $source;
     $this->name        = $name;
     $this->constraints = $constraints;
-    $this->var         = array_key_exists($this->name, $this->source) ? $this->source[$this->name] : null;
+    $this->var         = array_key_exists($this->name, $this->source) ? trim($this->source[$this->name]) : null;
   }
 
   /**
@@ -60,10 +60,12 @@ class Rule
 
         if (!is_bool($ret) || !$ret)
         {
-          if (!array_key_exists($this->name, $messages))
+          if (!array_key_exists($this->name, $messages) || $function == 'required')
             $messages[$this->name] = array();
           $pass                    = false;
           $messages[$this->name][] = $ret;
+          if ($function == 'required')
+            break;
         }
       }
     }
@@ -79,7 +81,7 @@ class Rule
    */
   private function required()
   {
-    if (array_key_exists($this->name, $this->source))
+    if (array_key_exists($this->name, $this->source) && !empty($this->var))
       return true;
     else
       return "Champ obligatoire";
