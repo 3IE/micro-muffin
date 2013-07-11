@@ -278,11 +278,12 @@ function writeOverrideBaseFunctions($className)
 
   //all
   $str .= TAB . "/**\n";
+  $str .= TAB . " * @param string \$order\n";
   $str .= TAB . " * @return " . $className . "[]\n";
   $str .= TAB . " */\n";
-  $str .= TAB . 'public static function all()' . "\n";
+  $str .= TAB . 'public static function all($order = \'id\')' . "\n";
   $str .= TAB . "{\n";
-  $str .= TAB . TAB . 'return parent::all();' . "\n";
+  $str .= TAB . TAB . 'return parent::all($order);' . "\n";
   $str .= TAB . "}\n";
 
   return $str;

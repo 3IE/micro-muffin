@@ -54,15 +54,16 @@ class Readable extends Model
   /**
    * Find all models in database
    *
+   * @param string $order
    * @return Model[]
    */
-  public static function all()
+  public static function all($order = 'id')
   {
     $class = strtolower(get_called_class());
     $proc  = self::$procstock_all != null ? self::$procstock_all : $class . 's';
     $pdo   = PDOS::getInstance();
 
-    $query = $pdo->prepare('SELECT * FROM getall' . $proc . '()');
+    $query = $pdo->prepare('SELECT * FROM getall' . $proc . '() ORDER BY '.$order);
     $query->execute();
 
     $datas = $query->fetchAll();
