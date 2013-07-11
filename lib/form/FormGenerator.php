@@ -33,6 +33,9 @@ class FormGenerator
   /** @var string */
   private $formError;
 
+  /** @var array */
+  private $buttons;
+
   /**
    * @param string $action
    * @param string $method
@@ -46,8 +49,21 @@ class FormGenerator
     $this->isHorizontal = true;
     $this->formError    = null;
     $this->submitLabel  = 'Valider';
+    $this->buttons      = array();
   }
 
+  /**
+   * @param string $name
+   * @param string $href
+   */
+  public function addButton($name, $href)
+  {
+    $this->buttons[] = array('name' => $name, 'href' => $href);
+  }
+
+  /**
+   * @param array $errors
+   */
   public function fillErrors(&$errors)
   {
     if (!is_null($errors))
@@ -189,7 +205,13 @@ class FormGenerator
       $str .= '</fieldset>';
 
 
-    $str .= '<div class="control-group"><div class="controls"><button type="submit" class="btn btn-primary">' . $this->submitLabel . '</button></div></div>';
+    $str .= '<div class="control-group"><div class="controls">';
+    $str .= '<button type="submit" class="btn btn-primary">' . $this->submitLabel . '</button>';
+
+    foreach ($this->buttons as $button)
+      $str .= ' <a class="btn" href="'.$button['href'].'">'.$button['name'].'</a>';
+
+    $str .= '</div></div>';
 
     if ($requiredFields)
       $str .= '<div><div class="control-group"><div class="controls">' . Field::requiredStarToString() . ' champs obligatoires</div></div></div>';
