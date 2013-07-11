@@ -12,10 +12,14 @@ namespace Lib;
 
 class Controller
 {
+  const SESSION_FLASH = '_flash';
+
+  /** @var array $variables */
   protected $variables = array();
 
   /** @var string $render */
   protected $render = "true";
+
   /** @var string $render_layout */
   protected $render_layout = "true";
 
@@ -89,5 +93,30 @@ class Controller
    */
   public function before_filter($params = array())
   {
+  }
+
+  /**
+   * @param string $text
+   */
+  public function flash($text)
+  {
+    $_SESSION[self::SESSION_FLASH] = $text;
+  }
+
+  /**
+   * @return string
+   */
+  public static function getFlash()
+  {
+    if (isset($_SESSION[self::SESSION_FLASH]))
+      return $_SESSION[self::SESSION_FLASH];
+    else
+      return null;
+  }
+
+  public static function emptyFlash()
+  {
+    if (isset($_SESSION[self::SESSION_FLASH]))
+      unset($_SESSION[self::SESSION_FLASH]);
   }
 }

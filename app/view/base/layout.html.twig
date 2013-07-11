@@ -12,5 +12,20 @@
     <a href="/">Index</a>
 </p>
 {{ _page }}
+
+{% if isFlash %}
+    <div class="modal hide fade" id="_flashModal" tabindex="-1" role="dialog">
+        <div class="modal-body">
+            <p>{{ flash }}</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">OK</button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $("#_flashModal").modal('show');
+    </script>
+{% endif %}
+
 </body>
 </html>
