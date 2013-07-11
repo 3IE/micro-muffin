@@ -51,7 +51,11 @@ class Select extends Field
   public function toString()
   {
     $str = '';
-    $str .= '<div class="control-group">';
+
+    if (count($this->errors) > 0)
+      $str .= '<div class="control-group error">';
+    else
+      $str .= '<div class="control-group">';
 
     if ($this->label != null)
     {
@@ -61,7 +65,7 @@ class Select extends Field
     }
 
     $str .= '<div class="controls">';
-    $str .= '<select>';
+    $str .= '<select name="' . $this->name . '" ' . (!is_null($this->class) ? 'class="' . $this->class . '"' : null) . '>';
     foreach ($this->options as $k => $v)
     {
       if ($this->selected == $k)
@@ -71,6 +75,16 @@ class Select extends Field
     }
     $str .= '</select> ';
     $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
+
+    if (count($this->errors) > 0)
+    {
+      $str .= '<span class="help-inline"> ';
+      foreach ($this->errors as $e)
+        $str .= $e . ', ';
+      $str = substr($str, 0, -2);
+      $str .= '</span>';
+    }
+
     $str .= '</div></div>';
 
     return $str;

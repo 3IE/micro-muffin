@@ -29,6 +29,27 @@ abstract class Field
   /** @var bool */
   protected $disable = false;
 
+  /** @var string */
+  protected $class = null;
+
+  /**
+   * @param $class
+   * @return $this
+   */
+  public function setClass($class)
+  {
+    $this->class = $class;
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getClass()
+  {
+    return $this->class;
+  }
+
   /**
    * @return $this
    */

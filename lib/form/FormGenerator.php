@@ -36,6 +36,9 @@ class FormGenerator
   /** @var array */
   private $buttons;
 
+  /** @var string */
+  private $fieldClass;
+
   /**
    * @param string $action
    * @param string $method
@@ -50,6 +53,12 @@ class FormGenerator
     $this->formError    = null;
     $this->submitLabel  = 'Valider';
     $this->buttons      = array();
+    $this->fieldClass   = null;
+  }
+
+  public function setFieldClass($class)
+  {
+    $this->fieldClass = $class;
   }
 
   /**
@@ -197,6 +206,9 @@ class FormGenerator
 
     foreach ($this->fields as $field)
     {
+      if (!is_null($this->fieldClass) && is_null($field->getClass()))
+        $field->setClass($this->fieldClass);
+
       $requiredFields = $requiredFields || $field->isRequired();
       $str .= $field->toString();
     }

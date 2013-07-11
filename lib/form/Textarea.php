@@ -17,6 +17,9 @@ class Textarea extends Field
   /** @var string */
   private $placeholder;
 
+  /** @var int */
+  private $rows;
+
   /**
    * @param string $name
    * @param int $required
@@ -27,6 +30,17 @@ class Textarea extends Field
     $this->required    = $required;
     $this->value       = null;
     $this->placeholder = null;
+    $this->rows        = 3;
+  }
+
+  /**
+   * @param int $n
+   * @return $this
+   */
+  public function setRows($n)
+  {
+    $this->rows = $n;
+    return $this;
   }
 
   /**
@@ -95,7 +109,7 @@ class Textarea extends Field
     }
 
     $str .= '<div class="controls" >';
-    $str .= '<textarea ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $value . '</textarea> ';
+    $str .= '<textarea ' . (!is_null($this->class) ? 'class="' . $this->class . '"' : null) . ' rows="' . $this->rows . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $value . '</textarea> ';
     $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
 
     if (count($this->errors) > 0)
