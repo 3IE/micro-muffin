@@ -3,7 +3,7 @@
 ##What is it ?
 micro-muffin is a light MVC framework for PHP website.
 
-Its philosophy is quite different than others framework, because **database design is in the center of your website**. You have the design your database, then you will generate your models and write your controllers.
+Its philosophy is quite different than others framework, because **database design is in the center of your website**. You have to design your database, then you will generate your models and write your controllers.
 
 ##Requirements
 * PHP 5.3
