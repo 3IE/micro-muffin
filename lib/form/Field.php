@@ -57,9 +57,13 @@ abstract class Field
     return $this;
   }
 
+  /**
+   * @return $this
+   */
   public function setRequired()
   {
     $this->required = self::FIELD_REQUIRED;
+    return $this;
   }
 
   /**

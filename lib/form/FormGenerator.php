@@ -48,7 +48,7 @@ class FormGenerator
     $this->submitLabel  = 'Valider';
   }
 
-  public function fillErrors(Array &$errors)
+  public function fillErrors(&$errors)
   {
     if (!is_null($errors))
     {
