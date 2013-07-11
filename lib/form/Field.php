@@ -26,6 +26,18 @@ abstract class Field
   /** @var array */
   protected $errors;
 
+  /** @var bool */
+  protected $disable = false;
+
+  /**
+   * @return $this
+   */
+  public function disable()
+  {
+    $this->disable = true;
+    return $this;
+  }
+
   /**
    * @param array $errors
    */

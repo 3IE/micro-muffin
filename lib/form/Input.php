@@ -136,7 +136,7 @@ class Input extends Field
     }
 
     $str .= '<div class="controls" >';
-    $str .= '<input type="' . $this->type . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '"' . $value . ' /> ';
+    $str .= '<input type="' . $this->type . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '"' . $value . ' '.($this->disable ? 'disabled' : null).'/> ';
     $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
 
     if (count($this->errors) > 0)
