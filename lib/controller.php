@@ -82,4 +82,12 @@ class Controller
       header("Location: " . $_SESSION["intented"]);
     die();
   }
+
+  /**
+   * @param array $params
+   * @return void
+   */
+  public function before_filter($params = array())
+  {
+  }
 }
