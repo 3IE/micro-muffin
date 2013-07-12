@@ -23,6 +23,25 @@ class Controller
   /** @var string $render_layout */
   protected $render_layout = "true";
 
+  protected $layout_variables = array();
+
+  /**
+   * @param string $name
+   * @param mixed $val
+   */
+  protected function setLayoutVariable($name, $val)
+  {
+    $this->layout_variables[$name] = $val;
+  }
+
+  /**
+   * @return array
+   */
+  public function getLayoutVariables()
+  {
+    return $this->layout_variables;
+  }
+
   /**
    * @param string $name
    * @param mixed $val
