@@ -20,6 +20,9 @@ class Textarea extends Field
   /** @var int */
   private $rows;
 
+  /** @var bool */
+  private $tinyMce;
+
   /**
    * @param string $name
    * @param int $required
@@ -31,6 +34,16 @@ class Textarea extends Field
     $this->value       = null;
     $this->placeholder = null;
     $this->rows        = 3;
+    $this->tinyMce     = false;
+  }
+
+  /**
+   * @return $this
+   */
+  public function enableTinyMce()
+  {
+    $this->tinyMce = true;
+    return $this;
   }
 
   /**
@@ -111,6 +124,8 @@ class Textarea extends Field
     $str .= '<div class="controls" >';
     $str .= '<textarea ' . (!is_null($this->class) ? 'class="' . $this->class . '"' : null) . ' rows="' . $this->rows . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $value . '</textarea> ';
     $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
+
+    $str .= '<script type="text/javascript"> tinymce.init({ selector: "textarea#' . $this->name . '", plugins: ["code"] });</script>';
 
     if (count($this->errors) > 0)
     {
