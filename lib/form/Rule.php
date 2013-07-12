@@ -81,7 +81,7 @@ class Rule
    */
   private function required()
   {
-    if (array_key_exists($this->name, $this->source) && !empty($this->var))
+    if (array_key_exists($this->name, $this->source) && strlen($this->var) > 0)
       return true;
     else
       return "Champ obligatoire";
