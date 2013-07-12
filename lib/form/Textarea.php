@@ -107,7 +107,6 @@ class Textarea extends Field
     $str       = '';
     $nameUp    = $this->name;
     $nameUp[0] = strtoupper($nameUp[0]);
-    $value     = !is_null($this->value) ? ' value="' . $this->value . '" ' : null;
 
     if (count($this->errors) > 0)
       $str .= '<div class="control-group error">';
@@ -122,7 +121,7 @@ class Textarea extends Field
     }
 
     $str .= '<div class="controls" >';
-    $str .= '<textarea ' . (!is_null($this->class) ? 'class="' . $this->class . '"' : null) . ' rows="' . $this->rows . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $value . '</textarea> ';
+    $str .= '<textarea ' . (!is_null($this->class) ? 'class="' . $this->class . '"' : null) . ' rows="' . $this->rows . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $this->value . '</textarea> ';
     $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
 
     $str .= '<script type="text/javascript"> tinymce.init({ selector: "textarea#' . $this->name . '", plugins: ["code"] });</script>';
