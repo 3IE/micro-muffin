@@ -21,7 +21,7 @@ class Textarea extends Field
   private $rows;
 
   /** @var bool */
-  private $tinyMce;
+  private $redactor;
 
   /**
    * @param string $name
@@ -34,15 +34,15 @@ class Textarea extends Field
     $this->value       = null;
     $this->placeholder = null;
     $this->rows        = 3;
-    $this->tinyMce     = false;
+    $this->redactor    = false;
   }
 
   /**
    * @return $this
    */
-  public function enableTinyMce()
+  public function enableRedactor()
   {
-    $this->tinyMce = true;
+    $this->redactor = true;
     return $this;
   }
 
@@ -124,7 +124,15 @@ class Textarea extends Field
     $str .= '<textarea ' . (!is_null($this->class) ? 'class="' . $this->class . '"' : null) . ' rows="' . $this->rows . '" ' . $this->placeholderToString() . ' name="' . $this->name . '" id="' . $this->name . '">' . $this->value . '</textarea> ';
     $str .= $this->required == self::FIELD_REQUIRED ? self::requiredStarToString() : null;
 
-    $str .= '<script type="text/javascript"> tinymce.init({ selector: "textarea#' . $this->name . '", plugins: ["code"] });</script>';
+    if ($this->redactor)
+    {
+      $str .= '<script type="text/javascript">
+          $(document).ready(function()
+          {
+          $(\'textarea#' . $this->name . '\').redactor({css: \'/css/redactor.css\'});
+          });
+          </script>';
+    }
 
     if (count($this->errors) > 0)
     {
