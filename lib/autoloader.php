@@ -9,11 +9,10 @@
 
 namespace Lib;
 
+require_once('tools.php');
+
 class Autoloader
 {
-  /** @var Autoloader */
-  private static $instance = null;
-
   /** @var array */
   private static $include_path = array();
 
