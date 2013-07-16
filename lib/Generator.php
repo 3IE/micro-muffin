@@ -131,11 +131,11 @@ class Generator
     $str                = TAB . 'protected' . ' $_' . $field . " = " . (is_null($column_defaults[$field]) ? "null" : $column_defaults[$field]) . ";\n\n";
 
     //Writing getter
-    $str .= TAB . ($visible ? "public" : "private") . " private function get" . $fieldCapitalize . "()\n" . TAB . "{\n";
+    $str .= TAB . ($visible ? "public" : "private") . " function get" . $fieldCapitalize . "()\n" . TAB . "{\n";
     $str .= TAB . TAB . 'return $this->_' . $field . ";\n" . TAB . "}\n\n";
 
     //Writting setter
-    $str .= TAB . ($visible ? "public" : "private") . " private function set" . $fieldCapitalize . '($' . $field . ")\n" . TAB . "{\n";
+    $str .= TAB . ($visible ? "public" : "private") . " function set" . $fieldCapitalize . '($' . $field . ")\n" . TAB . "{\n";
     $str .= TAB . TAB . '$this->_objectEdited();' . "\n";
     $str .= TAB . TAB . '$this->_' . $field . ' = $' . $field . ";\n" . TAB . "}\n\n";
 
@@ -169,7 +169,7 @@ class Generator
 
     //Getter
     $str .= TAB . "/** @return " . $className . " */\n";
-    $str .= TAB . "public private function get" . $object_fieldUp . "()\n" . TAB . "{\n";
+    $str .= TAB . "public function get" . $object_fieldUp . "()\n" . TAB . "{\n";
     $str .= TAB . TAB . 'if (is_null($this->' . $var . '))' . "\n";
     $str .= TAB . TAB . TAB . '$this->' . $var . ' = ' . $className . '::find($this->_' . $field . ');' . "\n";
     $str .= TAB . TAB . 'return $this->' . $var . ';' . "\n";
@@ -179,7 +179,7 @@ class Generator
     $foreignFieldUp    = $foreignField;
     $foreignFieldUp[0] = strtoupper($foreignFieldUp[0]);
     $str .= TAB . "/** @param " . $className . " \$" . $var . "*/\n";
-    $str .= TAB . "public private function set" . $object_fieldUp . "(\$" . $var . ")\n" . TAB . "{\n";
+    $str .= TAB . "public function set" . $object_fieldUp . "(\$" . $var . ")\n" . TAB . "{\n";
     $str .= TAB . TAB . '$this->' . $var . ' = $' . $var . ";\n";
     $str .= TAB . TAB . '$this->_' . $field . ' = $' . $var . "->get" . $foreignFieldUp . "();\n";
     $str .= TAB . TAB . '$this->_objectEdited();' . "\n";
@@ -205,13 +205,13 @@ class Generator
 
     $pdo->beginTransaction();
     $pdo->exec("
-  CREATE OR REPLACE private function " . $procedureName . "(foreign_column " . $columnType . ")
+  CREATE OR REPLACE function " . $procedureName . "(foreign_column " . $columnType . ")
   RETURNS SETOF " . $foreignTable . " AS
   'SELECT * FROM " . $foreignTable . " WHERE " . $foreignColumn . " = \$1'
   LANGUAGE sql VOLATILE
   COST 100
   ROWS 1000;
-  ALTER private function " . $procedureName . "(" . $columnType . ")
+  ALTER function " . $procedureName . "(" . $columnType . ")
   OWNER TO " . DBUSER . ";");
     $pdo->commit();
 
@@ -256,7 +256,7 @@ class Generator
     $str .= TAB . "/**\n";
     $str .= TAB . " * @return " . substr($fieldUppered, 0, -1) . "[]\n";
     $str .= TAB . " */\n";
-    $str .= TAB . 'public private function get' . $varUppered . "()\n";
+    $str .= TAB . 'public function get' . $varUppered . "()\n";
     $str .= TAB . "{\n";
     $str .= TAB . TAB . "if (is_null(\$this->" . $var . "))\n";
     $str .= TAB . TAB . "{\n";
@@ -284,7 +284,7 @@ class Generator
     $str .= TAB . " * @param int \$id\n";
     $str .= TAB . " * @return " . $className . "\n";
     $str .= TAB . " */\n";
-    $str .= TAB . 'public static private function find($id)' . "\n";
+    $str .= TAB . 'public static function find($id)' . "\n";
     $str .= TAB . "{\n";
     $str .= TAB . TAB . 'return parent::find($id);' . "\n";
     $str .= TAB . "}\n\n";
@@ -294,7 +294,7 @@ class Generator
     $str .= TAB . " * @param string \$order\n";
     $str .= TAB . " * @return " . $className . "[]\n";
     $str .= TAB . " */\n";
-    $str .= TAB . 'public static private function all($order = \'id\')' . "\n";
+    $str .= TAB . 'public static function all($order = \'id\')' . "\n";
     $str .= TAB . "{\n";
     $str .= TAB . TAB . 'return parent::all($order);' . "\n";
     $str .= TAB . "}\n";
@@ -391,12 +391,12 @@ class Generator
 
     $pdo->beginTransaction();
 
-    $pdo->exec("CREATE OR REPLACE private function " . $procedureName . "()
+    $pdo->exec("CREATE OR REPLACE function " . $procedureName . "()
   RETURNS SETOF " . $tableName . " AS
   'SELECT * FROM " . $tableName . "'
   LANGUAGE SQL VOLATILE
   COST 100;
-  ALTER private function " . $procedureName . "()
+  ALTER function " . $procedureName . "()
   OWNER TO \"" . DBUSER . "\";");
 
     $pdo->commit();
@@ -414,12 +414,12 @@ class Generator
 
     $pdo->beginTransaction();
 
-    $pdo->exec("CREATE OR REPLACE private function " . $procedureName . "(" . $parameter . " numeric)
+    $pdo->exec("CREATE OR REPLACE function " . $procedureName . "(" . $parameter . " numeric)
   RETURNS " . $tableName . " AS
   'SELECT * FROM " . $tableName . " " . $alias . " WHERE " . $alias . ".id = \$1'
   LANGUAGE sql VOLATILE
   COST 100;
-  ALTER private function " . $procedureName . "(numeric)
+  ALTER function " . $procedureName . "(numeric)
   OWNER TO \"" . DBUSER . "\";");
 
     $pdo->commit();
@@ -435,12 +435,12 @@ class Generator
 
     $pdo->beginTransaction();
     $pdo->exec("
-  CREATE OR REPLACE private function " . $procedureName . "()
+  CREATE OR REPLACE function " . $procedureName . "()
   RETURNS bigint AS
   'SELECT COUNT(id) FROM " . $tableName . "'
   LANGUAGE sql VOLATILE
   COST 100;
-  ALTER private function count" . $tableName . "()
+  ALTER function count" . $tableName . "()
   OWNER TO \"" . DBUSER . "\";
   ");
     $pdo->commit();
@@ -478,13 +478,13 @@ class Generator
             $buffer .= TAB . "protected \$" . $p['name'] . ";\n\n";
 
             //Getter
-            $buffer .= TAB . "public private function get" . $nameUppered . "()\n";
+            $buffer .= TAB . "public function get" . $nameUppered . "()\n";
             $buffer .= TAB . "{\n";
             $buffer .= TAB . TAB . "return \$this->" . $p['name'] . ";\n";
             $buffer .= TAB . "}\n\n";
 
             //Setter
-            $buffer .= TAB . "protected private function set" . $nameUppered . "(\$" . $p['name'] . ")\n";
+            $buffer .= TAB . "protected function set" . $nameUppered . "(\$" . $p['name'] . ")\n";
             $buffer .= TAB . "{\n";
             $buffer .= TAB . TAB . "\$this->" . $p['name'] . " = \$" . $p['name'] . ";\n";
             $buffer .= TAB . "}\n\n";
@@ -527,14 +527,14 @@ class Generator
         $query .= ')';
       }
 
-      //Execute private function
+      //Execute function
       $buffer .= TAB . "/**\n";
       if ($sp['return_type'] != 'record')
         $buffer .= TAB . " * @return array\n";
       else
         $buffer .= TAB . " * @return " . $className . "[]\n";
       $buffer .= TAB . " */\n";
-      $buffer .= TAB . 'public static private function ' . $prototype . "\n";
+      $buffer .= TAB . 'public static function ' . $prototype . "\n";
       $buffer .= TAB . "{\n";
       $buffer .= TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
       $buffer .= TAB . TAB . "\$query = \$pdo->prepare('" . $query . "');\n";
@@ -614,8 +614,7 @@ class Generator
     try
     {
       $pdo = PDOS::getInstance();
-    }
-    catch (\Exception $e)
+    } catch (\Exception $e)
     {
       $this->writeLine("Error ! Connection to database failed.");
       exit(1);
