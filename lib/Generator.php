@@ -157,13 +157,11 @@ class Generator
     $var[0]       = strtolower($var[0]);
 
     //Object field
-    //FIXME - Fixe à l'arrache, à recoder proprement !
-    $this_field_tab    = explode("_", $field);
+    $this_field_tab    = explode("_" . $foreignField, $field);
     $object_field      = $this_field_tab[0];
     $object_fieldUp    = $object_field;
     $object_fieldUp[0] = strtoupper($object_fieldUp[0]);
-    //FIXME - End fix degueulasse
-    $var = $object_field;
+    $var               = $object_field;
     $str .= TAB . "/** @var " . $className . " */\n";
     $str .= TAB . 'protected $' . $var . " = null;\n\n";
 
