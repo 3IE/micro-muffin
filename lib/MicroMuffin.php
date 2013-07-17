@@ -11,6 +11,9 @@ namespace Lib;
 
 class MicroMuffin
 {
+  /** @var MicroMuffin */
+  private static $instance = null;
+
   /** @var array */
   private $route;
 
@@ -37,7 +40,7 @@ class MicroMuffin
     \Twig_Autoloader::register();
   }
 
-  private function getRoute()
+  private function route()
   {
     //Route determination
     $url   = Tools::getParam("url", null);
@@ -115,12 +118,22 @@ class MicroMuffin
     $this->action     = null;
   }
 
+  public function getRoute()
+  {
+    return $this->route;
+  }
+
+  public static function getInstance()
+  {
+    return self::$instance;
+  }
+
   public static function run()
   {
-    $app = new MicroMuffin();
-    $app->init();
-    $app->getRoute();
-    $app->checkRoute();
-    $app->execute();
+    self::$instance = new MicroMuffin();
+    self::$instance->init();
+    self::$instance->route();
+    self::$instance->checkRoute();
+    self::$instance->execute();
   }
 }
