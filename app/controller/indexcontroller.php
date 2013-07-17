@@ -11,15 +11,6 @@ class IndexController extends \Lib\Controller
 {
   public function index($params = array())
   {
-    var_dump(Mod::all());
 
-    $u = User::find(12);
-    $a = Article::find(2);
-
-    var_dump($u);
-    var_dump($a);
-    $m = new Mod();
-    $m->setUser($u);
-    $m->setArticle($a);
   }
 }
