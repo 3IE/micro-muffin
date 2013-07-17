@@ -665,7 +665,7 @@ class Generator
     }
 
     $this->writeLine("Success !");
-    $this->writeLine("Retrieving database public schema...");
+    $this->writeLine("Retrieving database " . DBSCHEMA . " schema...");
 
 //Getting constraints
     $query = $pdo->prepare("
@@ -705,7 +705,7 @@ SELECT
 FROM
   information_schema.columns
 WHERE
-  table_schema = 'public'
+  table_schema = '" . DBSCHEMA . "'
 ORDER BY
   table_name");
     $query->execute();
@@ -731,7 +731,7 @@ ORDER BY
       else
         $this->tableId[] = $field['table_name'];
       if (!is_null($field['sequence_name']))
-        $sequences[$field['table_name']] = explode('public.', $field['sequence_name'])[1];
+        $sequences[$field['table_name']] = explode(DBSCHEMA . '.', $field['sequence_name'])[1];
     }
 
     $this->sequences    = $sequences;
@@ -752,7 +752,7 @@ FROM
   information_schema.routines r
   LEFT JOIN information_schema.parameters p ON p.specific_name = r.specific_name
 WHERE
-  r.specific_schema = 'public' AND
+  r.specific_schema = '" . DBSCHEMA . "' AND
   r.routine_type = 'FUNCTION' AND
   r.routine_name LIKE 'sp_%'
 ORDER BY
