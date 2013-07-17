@@ -38,8 +38,28 @@ namespace Lib;
 
 class Generator
 {
+  /** @var array */
+  private $tablesFields;
+
+  /** @var array */
+  private $MTOconstraints;
+
+  /** @var array */
+  private $OTMconstraints;
+
+  /** @var array */
+  private $tableId;
+
+  /** @var array */
+  private $sequences;
+
   private function __construct()
   {
+    $this->tablesFields   = array();
+    $this->OTMconstraints = array();
+    $this->MTOconstraints = array();
+    $this->tableId        = array();
+    $this->sequences      = array();
   }
 
   private function init()
@@ -273,7 +293,7 @@ class Generator
    * @param string $className
    * @return string
    */
-  private function writeOverrideBaseFunctions($className)
+  private function writeOverrideFindFunctions($className)
   {
     $str = '';
 
@@ -287,12 +307,23 @@ class Generator
     $str .= TAB . TAB . 'return parent::find($id);' . "\n";
     $str .= TAB . "}\n\n";
 
+    return $str;
+  }
+
+  /**
+   * @param string $className
+   * @return string
+   */
+  private function writeOverrideAllFunctions($className)
+  {
+    $str = '';
+
     //all
     $str .= TAB . "/**\n";
     $str .= TAB . " * @param string \$order\n";
     $str .= TAB . " * @return " . $className . "[]\n";
     $str .= TAB . " */\n";
-    $str .= TAB . 'public static function all($order = \'id\')' . "\n";
+    $str .= TAB . 'public static function all($order = NULL)' . "\n";
     $str .= TAB . "{\n";
     $str .= TAB . TAB . 'return parent::all($order);' . "\n";
     $str .= TAB . "}\n";
@@ -316,16 +347,20 @@ class Generator
     $className         = "T_" . $class;
     $className[2]      = strtoupper($className[2]);
     $filename          = THIS_T_MODEL_DIR . 't_' . $class . '.php';
+    $extendFrom        = '\Lib\Models\Deletable';
 
     $file = fopen($filename, 'w');
 
     if ($file)
     {
       fwrite($file, DISCLAIMER);
-      fwrite($file, 'class ' . $className . ' extends \Lib\Models\Deletable' . "\n{\n");
+      fwrite($file, 'class ' . $className . ' extends ' . $extendFrom . "\n{\n");
 
       fwrite($file, TAB . "protected static \$table_name = '" . $tableName . "';\n");
-      fwrite($file, TAB . "protected static \$sequence_name = '" . $sequences[$tableName] . "';\n\n");
+      if ($this->haveSequence($originalTableName))
+        fwrite($file, TAB . "protected static \$sequence_name = '" . $sequences[$tableName] . "';\n");
+
+      fwrite($file, "\n");
 
       foreach ($fields as $field)
       {
@@ -346,7 +381,9 @@ class Generator
         }
       }
 
-      fwrite($file, $this->writeOverrideBaseFunctions(substr($className, 2)));
+      if ($this->haveId($originalTableName))
+        fwrite($file, $this->writeOverrideFindFunctions(substr($className, 2)));
+      fwrite($file, $this->writeOverrideAllFunctions(substr($className, 2)));
 
       fwrite($file, "}\n");
       fclose($file);
@@ -435,7 +472,7 @@ class Generator
     $pdo->exec("
   CREATE OR REPLACE function " . $procedureName . "()
   RETURNS bigint AS
-  'SELECT COUNT(id) FROM " . $tableName . "'
+  'SELECT COUNT(*) FROM " . $tableName . "'
   LANGUAGE sql VOLATILE
   COST 100;
   ALTER function count" . $tableName . "()
@@ -597,6 +634,15 @@ class Generator
     }
   }
 
+  private function haveId($table)
+  {
+    return in_array($table, $this->tableId);
+  }
+
+  private function haveSequence($table)
+  {
+    return array_key_exists($table, $this->sequences);
+  }
 
   private function execute()
   {
@@ -646,6 +692,9 @@ WHERE constraint_type = 'FOREIGN KEY';");
       $oneToManyConstraints[$constraint['foreign_table_name']][] = $constraint;
     }
 
+    $this->OTMconstraints = $oneToManyConstraints;
+    $this->MTOconstraints = $manyToOneConstraints;
+
 //Getting all fields of all tables from public schema
     $query = $pdo->prepare("
 SELECT
@@ -679,10 +728,14 @@ ORDER BY
         $tables_fields[$field['table_name']][]                        = $field['column_name'];
         $column_defaults[$field['table_name']][$field['column_name']] = is_null($field['sequence_name']) ? $field['column_default'] : null;
       }
+      else
+        $this->tableId[] = $field['table_name'];
       if (!is_null($field['sequence_name']))
         $sequences[$field['table_name']] = explode('public.', $field['sequence_name'])[1];
     }
 
+    $this->sequences    = $sequences;
+    $this->tablesFields = $tables_fields;
     unset($fields);
     unset($field);
 
@@ -732,7 +785,7 @@ ORDER BY
     $this->writeLine(count($tables) . ' table' . (count($tables) > 1 ? 's' : '') . ' found');
     $this->writeLine("Generating models...");
 
-//Foreach table, generates both T_Model and Model
+    //Foreach table, generates both T_Model and Model
     foreach ($tables as $table)
     {
       $fields            = $tables_fields[$table];
@@ -753,8 +806,11 @@ ORDER BY
       $this->writeAllProcedure($pdo, $originalTableName);
       $this->writeLine(' getall' . $originalTableName . '() function written in database');
 
-      $this->writeFindProcedure($pdo, $originalTableName);
-      $this->writeLine(' get' . substr($originalTableName, 0, -1) . 'fromid() function written in database');
+      if ($this->haveId($originalTableName))
+      {
+        $this->writeFindProcedure($pdo, $originalTableName);
+        $this->writeLine(' get' . substr($originalTableName, 0, -1) . 'fromid() function written in database');
+      }
 
       $this->writeCountProcedure($pdo, $originalTableName);
       $this->writeLine(' count' . $originalTableName . '() function written in database');

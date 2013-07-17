@@ -57,13 +57,16 @@ class Readable extends Model
    * @param string $order
    * @return Model[]
    */
-  public static function all($order = 'id')
+  public static function all($order = NULL)
   {
     $class = strtolower(get_called_class());
     $proc  = self::$procstock_all != null ? self::$procstock_all : $class . 's';
     $pdo   = PDOS::getInstance();
 
-    $query = $pdo->prepare('SELECT * FROM getall' . $proc . '() ORDER BY '.$order);
+    if (is_null($order))
+      $query = $pdo->prepare('SELECT * FROM getall' . $proc . '()');
+    else
+      $query = $pdo->prepare('SELECT * FROM getall' . $proc . '() ORDER BY ' . $order);
     $query->execute();
 
     $datas = $query->fetchAll();
@@ -87,7 +90,7 @@ class Readable extends Model
     $proc  = self::$procstock_count != null ? self::$procstock_count : 'count' . $class . 's';
     $pdo   = PDOS::getInstance();
 
-    $query = $pdo->prepare('SELECT * FROM '.$proc.'()');
+    $query = $pdo->prepare('SELECT * FROM ' . $proc . '()');
     $query->execute();
 
     $result = $query->fetch();
