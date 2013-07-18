@@ -100,16 +100,19 @@ class Router
         {
           $match = true;
           //Matching parameters
-          for ($i = 2; array_key_exists($i, $route_url); $i++)
+          for ($i = 0; array_key_exists($i, $route_url); $i++)
           {
-            if (preg_match("#" . $route_url[$i]['val'] . "#", $url_array[$i]))
+            if (is_aray($route_url[$i]))
             {
-              $params[$route_url[$i]['name']] = $url_array[$i];
-            }
-            else
-            {
-              $match = false;
-              break;
+              if (preg_match("#" . $route_url[$i]['val'] . "#", $url_array[$i]))
+              {
+                $params[$route_url[$i]['name']] = $url_array[$i];
+              }
+              else
+              {
+                $match = false;
+                break;
+              }
             }
           }
           if (!$match)
