@@ -88,7 +88,7 @@ class MicroMuffin
     //View displaying
     if ($this->controller->getRender() != "false")
     {
-      $loader = new \Twig_Loader_Filesystem('../' . VIEW_DIR . $this->route['controller']);
+      $loader = new \Twig_Loader_Filesystem('../' . VIEW_DIR . strtolower($this->route['controller']));
       $twig   = new \Twig_Environment($loader, array('cache' => false, 'autoescape' => false, 'strict_variables' => true));
 
       $page = $twig->render($this->action . ".html.twig", $this->controller->getVariables());
