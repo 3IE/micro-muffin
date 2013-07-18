@@ -93,27 +93,26 @@ class Router
       //Matching controller and action
       if (count($route_url) == count($url_array))
       {
-        if ($route_url == array() || (array_key_exists(0, $route_url) && $route_url[0] == $url_array[0] &&
-                (!array_key_exists(1, $route_url) || $route_url[1] == $url_array[1])
-            )
-        )
-        {
           $match = true;
           //Matching parameters
           for ($i = 0; array_key_exists($i, $route_url); $i++)
           {
-            if (is_aray($route_url[$i]))
-            {
-              if (preg_match("#" . $route_url[$i]['val'] . "#", $url_array[$i]))
+              $value = "";
+              if (is_array($route_url[$i]))
+                  $value = $route_url[$i]['val'];
+              else
+                  $value = $route_url[$i];
+
+              if (preg_match("#" . $value . "#", $url_array[$i]))
               {
-                $params[$route_url[$i]['name']] = $url_array[$i];
+                  if (is_array($route_url[$i]))
+                    $params[$route_url[$i]['name']] = $url_array[$i];
               }
               else
               {
                 $match = false;
                 break;
               }
-            }
           }
           if (!$match)
             continue;
@@ -142,7 +141,7 @@ class Router
               'params'     => $params
             );
           }
-        }
+        
       }
     }
     return null;
