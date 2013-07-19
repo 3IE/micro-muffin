@@ -86,7 +86,7 @@ class Router
     while (count($url_array) > 0 && $url_array[0] == "")
       array_shift($url_array);
 
-	while (count($url_array) > 0 && $url_array[count($url_array) - 1] == "")
+    while (count($url_array) > 0 && $url_array[count($url_array) - 1] == "")
       unset($url_array[count($url_array) - 1]);
 
     foreach (self::$routes as $route)
