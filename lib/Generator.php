@@ -53,6 +53,9 @@ class Generator
   /** @var array */
   private $sequences;
 
+  /** @var array */
+  private $primaryKeys;
+
   private function __construct()
   {
     $this->tablesFields   = array();
@@ -60,6 +63,7 @@ class Generator
     $this->MTOconstraints = array();
     $this->tableId        = array();
     $this->sequences      = array();
+    $this->primaryKeys    = array();
   }
 
   private function init()
@@ -368,6 +372,12 @@ class Generator
       if ($this->haveSequence($originalTableName))
         fwrite($file, TAB . "protected static \$sequence_name = '" . $sequences[$tableName] . "';\n");
 
+      $primary_keys = "protected static \$primary_keys = array(";
+      foreach ($this->primaryKeys[$originalTableName] as $pk)
+        $primary_keys .= "'" . $pk . "', ";
+      $primary_keys = substr($primary_keys, 0, -2) . ');';
+      fwrite($file, TAB . $primary_keys . "\n");
+
       fwrite($file, "\n");
 
       foreach ($fields as $field)
@@ -675,20 +685,20 @@ class Generator
     $this->writeLine("Success !");
     $this->writeLine("Retrieving database " . DBSCHEMA . " schema...");
 
-//Getting constraints
+//Getting foreign keys
     $query = $pdo->prepare("
-SELECT
-    tc.table_name,
-    kcu.column_name,
-    ccu.table_name AS foreign_table_name,
-    ccu.column_name AS foreign_column_name,
-    c.data_type AS foreign_column_type
-FROM
-    information_schema.table_constraints AS tc
-    JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
-    JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
-    JOIN information_schema.columns AS c ON c.table_name = ccu.table_name AND c.column_name = ccu.column_name
-WHERE constraint_type = 'FOREIGN KEY';");
+    SELECT
+        tc.table_name,
+        kcu.column_name,
+        ccu.table_name AS foreign_table_name,
+        ccu.column_name AS foreign_column_name,
+        c.data_type AS foreign_column_type
+    FROM
+        information_schema.table_constraints AS tc
+        JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
+        JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
+        JOIN information_schema.columns AS c ON c.table_name = ccu.table_name AND c.column_name = ccu.column_name
+    WHERE constraint_type = 'FOREIGN KEY';");
 
     $query->execute();
 
@@ -703,19 +713,39 @@ WHERE constraint_type = 'FOREIGN KEY';");
     $this->OTMconstraints = $oneToManyConstraints;
     $this->MTOconstraints = $manyToOneConstraints;
 
-//Getting all fields of all tables from public schema
+    //Getting primary keys
     $query = $pdo->prepare("
-SELECT
-  table_name,
-  column_name,
-  column_default,
-  pg_get_serial_sequence(table_name, column_name) AS sequence_name
-FROM
-  information_schema.columns
-WHERE
-  table_schema = '" . DBSCHEMA . "'
-ORDER BY
-  table_name");
+    SELECT
+      tc.table_name,
+      ccu.column_name
+    FROM
+        information_schema.table_constraints AS tc
+        INNER JOIN information_schema.constraint_column_usage AS ccu ON tc.constraint_name = ccu.constraint_name
+    WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.constraint_schema = '" . DBSCHEMA . "'");
+    $query->execute();
+
+    $primaryKeys = array();
+    foreach ($query->fetchAll() as $pk)
+    {
+      if (!array_key_exists($pk['table_name'], $primaryKeys))
+        $primaryKeys[$pk['table_name']] = array();
+      $primaryKeys[$pk['table_name']][] = $pk['column_name'];
+    }
+    $this->primaryKeys = $primaryKeys;
+
+    //Getting all fields of all tables from public schema
+    $query = $pdo->prepare("
+    SELECT
+      table_name,
+      column_name,
+      column_default,
+      pg_get_serial_sequence(table_name, column_name) AS sequence_name
+    FROM
+      information_schema.columns
+    WHERE
+      table_schema = '" . DBSCHEMA . "'
+    ORDER BY
+      table_name");
     $query->execute();
 
     $column_defaults = array();
@@ -749,23 +779,23 @@ ORDER BY
 
 //Getting all custom stored procedures (name like sp_*) and theirs parameters
     $query            = $pdo->prepare("
-SELECT
-  r.routine_name,
-  r.type_udt_name AS routine_return_type,
-  p.ordinal_position AS parameter_position,
-  p.parameter_name,
-  p.data_type AS parameter_type,
-  p.parameter_mode
-FROM
-  information_schema.routines r
-  LEFT JOIN information_schema.parameters p ON p.specific_name = r.specific_name
-WHERE
-  r.specific_schema = '" . DBSCHEMA . "' AND
-  r.routine_type = 'FUNCTION' AND
-  r.routine_name LIKE 'sp_%'
-ORDER BY
-  r.routine_name, parameter_position
-");
+    SELECT
+      r.routine_name,
+      r.type_udt_name AS routine_return_type,
+      p.ordinal_position AS parameter_position,
+      p.parameter_name,
+      p.data_type AS parameter_type,
+      p.parameter_mode
+    FROM
+      information_schema.routines r
+      LEFT JOIN information_schema.parameters p ON p.specific_name = r.specific_name
+    WHERE
+      r.specific_schema = '" . DBSCHEMA . "' AND
+      r.routine_type = 'FUNCTION' AND
+      r.routine_name LIKE 'sp_%'
+    ORDER BY
+      r.routine_name, parameter_position
+    ");
     $storedProcedures = array();
     $query->execute();
 

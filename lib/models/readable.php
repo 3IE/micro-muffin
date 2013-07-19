@@ -19,6 +19,8 @@ class Readable extends Model
   protected static $procstock_all = null;
   /** @var string|null */
   protected static $procstock_count = null;
+  /** @var array */
+  protected static $primary_keys = array();
 
   /**
    * Find a models with the corresponding id

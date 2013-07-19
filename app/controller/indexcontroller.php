@@ -11,6 +11,5 @@ class IndexController extends \Lib\Controller
 {
   public function index($params = array())
   {
-
   }
 }

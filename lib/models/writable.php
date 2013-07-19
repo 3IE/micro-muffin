@@ -70,7 +70,7 @@ class Writable extends Readable
       $pdo = PDOS::getInstance();
 
       if ($this->_id == 0)
-        $this->add($pdo, $table, $fields, $values, $attributes);
+        $this->add($pdo, $table, $fields, $values, $attrbutes);
       else
         $this->update($pdo, $table, $attributes);
     }
