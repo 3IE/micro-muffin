@@ -92,7 +92,12 @@ class Writable extends Readable
     foreach ($attributes as $k => $v)
     {
       if ($k != 'id')
-        $query->bindValue(':' . $k, $v);
+      {
+        if (is_bool($v))
+          $query->bindValue(':' . $k, $v, \PDO::PARAM_BOOL);
+        else
+          $query->bindValue(':' . $k, $v);
+      }
     }
     $query->execute();
     $this->setId($pdo->lastInsertId(self::$sequence_name));

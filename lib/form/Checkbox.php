@@ -43,7 +43,10 @@ class Checkbox extends Field
 
     $str .= '<div class="control-group"><div class="controls">';
     $str .= '<label class="checkbox">';
-    $str .= '<input type="checkbox"> ' . $this->label;
+    if ($this->checked == true)
+      $str .= '<input name="' . $this->name . '" checked="checked" type="checkbox"> ' . $this->label;
+    else
+      $str .= '<input name="' . $this->name . '" type="checkbox"> ' . $this->label;
     $str .= '</label></div></div>';
 
     return $str;

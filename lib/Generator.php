@@ -272,7 +272,7 @@ class Generator
     $str .= TAB . '/** @var ' . $this->removeSFromTableName($fieldUppered) . '[] */' . "\n";
     $str .= TAB . 'protected $' . $var . " = null;\n\n";
     $str .= TAB . "/**\n";
-    $str .= TAB . " * @return " . substr($fieldUppered, 0, -1) . "[]\n";
+    $str .= TAB . " * @return " . $this->removeSFromTableName($fieldUppered) . "[]\n";
     $str .= TAB . " */\n";
     $str .= TAB . 'public function get' . $varUppered . "()\n";
     $str .= TAB . "{\n";
@@ -281,7 +281,15 @@ class Generator
     $str .= TAB . TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
     $str .= TAB . TAB . TAB . "\$query = \$pdo->prepare('SELECT * FROM " . $procedure . "('.\$this->_" . $fieldName . ".')');\n";
     $str .= TAB . TAB . TAB . "\$query->execute();\n";
-    $str .= TAB . TAB . TAB . "\$this->" . $var . " = \$query->fetchAll();\n";
+    $str .= TAB . TAB . TAB . "\$results = \$query->fetchAll();\n";
+    $str .= TAB . TAB . TAB . "\$objs = array();\n";
+    $str .= TAB . TAB . TAB . "foreach (\$results as \$r)\n";
+    $str .= TAB . TAB . TAB . "{\n";
+    $str .= TAB . TAB . TAB . TAB . "\$obj = new " . $this->removeSFromTableName($fieldUppered) . "();\n";
+    $str .= TAB . TAB . TAB . TAB . "self::hydrate(\$obj, \$r);\n";
+    $str .= TAB . TAB . TAB . TAB . "\$objs[] = \$obj;\n";
+    $str .= TAB . TAB . TAB . "}\n";
+    $str .= TAB . TAB . TAB . "\$this->" . $var . " = \$objs;\n";
     $str .= TAB . TAB . "}\n";
     $str .= TAB . TAB . "return \$this->" . $var . ";\n";
     $str .= TAB . "}\n\n";

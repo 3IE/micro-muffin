@@ -221,7 +221,7 @@ class FormGenerator
     $str .= '<button type="submit" class="btn btn-primary">' . $this->submitLabel . '</button>';
 
     foreach ($this->buttons as $button)
-      $str .= ' <a class="btn" href="'.$button['href'].'">'.$button['name'].'</a>';
+      $str .= ' <a class="btn" href="' . $button['href'] . '">' . $button['name'] . '</a>';
 
     $str .= '</div></div>';
 

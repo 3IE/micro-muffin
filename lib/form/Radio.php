@@ -24,10 +24,10 @@ class Radio extends Field
    */
   public function __construct($name, Array $options, $required)
   {
-    $this->name = $name;
-    $this->options = $options;
+    $this->name     = $name;
+    $this->options  = $options;
     $this->required = $required;
-    $this->checked = null;
+    $this->checked  = null;
   }
 
   /**
@@ -63,9 +63,9 @@ class Radio extends Field
     {
       $str .= '<label class="radio">';
       if ($this->checked == $k)
-        $str .= '<input type="radio" name="'.$this->name.'" value="'.$k.'" checked> '.$v;
+        $str .= '<input type="radio" name="' . $this->name . '" value="' . $k . '" checked> ' . $v;
       else
-        $str .= '<input type="radio" name="'.$this->name.'" value="'.$k.'"> '.$v;
+        $str .= '<input type="radio" name="' . $this->name . '" value="' . $k . '"> ' . $v;
       $str .= '</label>';
     }
     $str .= '</div></div>';

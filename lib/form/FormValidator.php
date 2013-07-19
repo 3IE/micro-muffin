@@ -45,7 +45,8 @@ class FormValidator
   public function check()
   {
     $pass = true;
-    foreach ($this->rules as $rule) {
+    foreach ($this->rules as $rule)
+    {
       $ret = $rule->check($this->messages);
       if (!is_bool($ret) || !$ret)
         $pass = false;

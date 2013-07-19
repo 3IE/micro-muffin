@@ -117,7 +117,7 @@ class Controller
   /**
    * @param string $text
    */
-  public function flash($text)
+  public static function flash($text)
   {
     $_SESSION[self::SESSION_FLASH] = $text;
   }
