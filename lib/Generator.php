@@ -302,21 +302,59 @@ class Generator
   }
 
   /**
-   * @param string $className
+   * @param $tableName
+   * @param $primaryKeys
    * @return string
    */
-  private function writeOverrideFindFunctions($className)
+  private function writeFindFunction($tableName, $primaryKeys)
   {
-    $str = '';
+    $str       = '';
+    $className = $this->removeSFromTableName($tableName);
+
+    $params      = '';
+    $proto       = '';
+    $placeholder = '';
+    $checkNull   = '';
+    foreach ($primaryKeys as $pk)
+    {
+      $params .= TAB . " * @param \$" . $pk['name'] . "\n";
+      $proto .= "\$" . $pk['name'] . ", ";
+      $placeholder .= ":" . $pk['name'] . ", ";
+      $checkNull .= '!is_null($result[\'' . $pk['name'] . '\']) && ';
+    }
+    $proto       = substr($proto, 0, -2);
+    $placeholder = substr($placeholder, 0, -2);
+    $checkNull   = substr($checkNull, 0, -4);
+
+    $procedureName = $this->writeFindProcedure($tableName, $primaryKeys);
 
     //find
     $str .= TAB . "/**\n";
-    $str .= TAB . " * @param int \$id\n";
+    $str .= $params;
     $str .= TAB . " * @return " . $className . "\n";
     $str .= TAB . " */\n";
-    $str .= TAB . 'public static function find($id)' . "\n";
+    $str .= TAB . 'public static function find(' . $proto . ')' . "\n";
     $str .= TAB . "{\n";
-    $str .= TAB . TAB . 'return parent::find($id);' . "\n";
+    $str .= TAB . TAB . '$pdo = \Lib\PDOS::getInstance();' . "\n";
+    $str .= TAB . TAB . "\$query = \$pdo->prepare('SELECT * FROM $procedureName($placeholder)');\n";
+    foreach ($primaryKeys as $pk)
+    {
+      $str .= TAB . TAB . "if (is_string(\$" . $pk['name'] . "))\n";
+      $str .= TAB . TAB . TAB . "\$query->bindValue(':" . $pk['name'] . "', \$" . $pk['name'] . ", PDO::PARAM_STR);\n";
+      $str .= TAB . TAB . "else\n";
+      $str .= TAB . TAB . TAB . "\$query->bindValue(':" . $pk['name'] . "', \$" . $pk['name'] . ");\n";
+    }
+    $str .= TAB . TAB . "\$query->execute();\n";
+    $str .= TAB . TAB . "\$result = \$query->fetch();\n";
+    $str .= TAB . TAB . "if (!is_null(\$result) && $checkNull)\n";
+    $str .= TAB . TAB . "{\n";
+    $str .= TAB . TAB . TAB . "\$output_object = new $className();\n";
+    $str .= TAB . TAB . TAB . "self::hydrate(\$output_object, \$result);\n";
+    $str .= TAB . TAB . TAB . "return \$output_object;\n";
+    $str .= TAB . TAB . "}\n";
+    $str .= TAB . TAB . "else\n";
+    $str .= TAB . TAB . TAB . " return null;\n";
+
     $str .= TAB . "}\n\n";
 
     return $str;
@@ -374,7 +412,7 @@ class Generator
 
       $primary_keys = "protected static \$primary_keys = array(";
       foreach ($this->primaryKeys[$originalTableName] as $pk)
-        $primary_keys .= "'" . $pk . "', ";
+        $primary_keys .= "'" . $pk['name'] . "', ";
       $primary_keys = substr($primary_keys, 0, -2) . ');';
       fwrite($file, TAB . $primary_keys . "\n");
 
@@ -399,8 +437,7 @@ class Generator
         }
       }
 
-      if ($this->haveId($originalTableName))
-        fwrite($file, $this->writeOverrideFindFunctions(substr($className, 2)));
+      fwrite($file, $this->writeFindFunction($originalTableName, $this->primaryKeys[$originalTableName]));
       fwrite($file, $this->writeOverrideAllFunctions(substr($className, 2)));
 
       fwrite($file, "}\n");
@@ -456,26 +493,44 @@ class Generator
   }
 
   /**
-   * @param \Lib\EPO $pdo
    * @param string $tableName
+   * @param $primaryKeys
+   * @return string
    */
-  private function writeFindProcedure(EPO &$pdo, $tableName)
+  private function writeFindProcedure($tableName, $primaryKeys)
   {
-    $procedureName = 'get' . substr($tableName, 0, -1) . 'fromid';
-    $parameter     = substr($tableName, 0, -1) . "_id";
-    $alias         = $tableName[0];
+    $procedureName = 'find' . $tableName;
+    //$parameter     = substr($tableName, 0, -1) . "_id";
+    $alias = $tableName[0];
+    $pdo   = PDOS::getInstance();
+
+    $proto     = '';
+    $where     = '';
+    $signature = '';
+    $count     = 1;
+    foreach ($primaryKeys as $pk)
+    {
+      $proto .= $pk['name'] . ' ' . $pk['type'] . ', ';
+      $where .= $alias . "." . $pk['name'] . ' = $' . $count++ . ' AND ';
+      $signature .= $pk['type'] . ', ';
+    }
+    $proto     = substr($proto, 0, -2);
+    $where     = substr($where, 0, -5);
+    $signature = substr($signature, 0, -2);
 
     $pdo->beginTransaction();
 
-    $pdo->exec("CREATE OR REPLACE function " . $procedureName . "(" . $parameter . " numeric)
-  RETURNS " . $tableName . " AS
-  'SELECT * FROM " . $tableName . " " . $alias . " WHERE " . $alias . ".id = \$1'
-  LANGUAGE sql VOLATILE
-  COST 100;
-  ALTER function " . $procedureName . "(numeric)
-  OWNER TO \"" . DBUSER . "\";");
+    $pdo->exec("CREATE OR REPLACE function " . $procedureName . "(" . $proto . ")
+    RETURNS " . $tableName . " AS
+    'SELECT * FROM " . $tableName . " " . $alias . " WHERE " . $where . "'
+    LANGUAGE sql VOLATILE
+    COST 100;
+    ALTER function " . $procedureName . "(" . $signature . ")
+    OWNER TO \"" . DBUSER . "\";");
 
     $pdo->commit();
+
+    return $procedureName;
   }
 
   /**
@@ -716,11 +771,13 @@ class Generator
     //Getting primary keys
     $query = $pdo->prepare("
     SELECT
-      tc.table_name,
-      ccu.column_name
+        tc.table_name,
+        ccu.column_name,
+        c.data_type
     FROM
         information_schema.table_constraints AS tc
         INNER JOIN information_schema.constraint_column_usage AS ccu ON tc.constraint_name = ccu.constraint_name
+        INNER JOIN information_schema.columns AS c ON c.column_name = ccu.column_name AND c.table_name = tc.table_name
     WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.constraint_schema = '" . DBSCHEMA . "'");
     $query->execute();
 
@@ -729,7 +786,7 @@ class Generator
     {
       if (!array_key_exists($pk['table_name'], $primaryKeys))
         $primaryKeys[$pk['table_name']] = array();
-      $primaryKeys[$pk['table_name']][] = $pk['column_name'];
+      $primaryKeys[$pk['table_name']][] = array('name' => $pk['column_name'], "type" => $pk['data_type']);
     }
     $this->primaryKeys = $primaryKeys;
 
@@ -844,12 +901,13 @@ class Generator
       $this->writeAllProcedure($pdo, $originalTableName);
       $this->writeLine(' getall' . $originalTableName . '() function written in database');
 
+      /*
       if ($this->haveId($originalTableName))
       {
         $this->writeFindProcedure($pdo, $originalTableName);
         $this->writeLine(' get' . substr($originalTableName, 0, -1) . 'fromid() function written in database');
       }
-
+      */
       $this->writeCountProcedure($pdo, $originalTableName);
       $this->writeLine(' count' . $originalTableName . '() function written in database');
 

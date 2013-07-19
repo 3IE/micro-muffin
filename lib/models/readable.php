@@ -28,6 +28,7 @@ class Readable extends Model
    * @param int $id
    * @return null|Model
    */
+  /*
   public static function find($id)
   {
     $class        = get_called_class();
@@ -52,6 +53,7 @@ class Readable extends Model
     else
       return null;
   }
+  */
 
   /**
    * Find all models in database

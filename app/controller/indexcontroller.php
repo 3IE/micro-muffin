@@ -11,5 +11,7 @@ class IndexController extends \Lib\Controller
 {
   public function index($params = array())
   {
+    $a = Mod::find(3, 13);
+    var_dump($a);
   }
 }

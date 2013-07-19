@@ -100,7 +100,7 @@ class Writable extends Readable
       }
     }
     $query->execute();
-    $this->setId($pdo->lastInsertId(self::$sequence_name));
+    $this->setId($pdo->lastInsertId(static::$sequence_name));
     $pdo->commit();
   }
 
