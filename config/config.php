@@ -14,6 +14,7 @@ define('DBUSER', 'postgres');
 define('DBPASS', 'root');
 define('DISPLAY_SQL_ERROR', true);
 
+require_once('../lib/autoloader.php');
 /*
  * Put your own directories with classes you wanted to be autoloaded
  * Example : \Lib\Autoloader::addPath('app/classes/')
