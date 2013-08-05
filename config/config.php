@@ -15,6 +15,11 @@ define('DBUSER', 'postgres');
 define('DBPASS', 'root');
 define('DISPLAY_SQL_ERROR', true);
 
+/* Application configuration */
+define('ENV', \Lib\MicroMuffin::ENV_DEV);
+define('DEFAULT_LOCALE', 'en_US');
+define('LOCALE', 'en_US');
+
 require_once('../lib/autoloader.php');
 /*
  * Put your own directories with classes you wanted to be autoloaded

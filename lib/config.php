@@ -20,6 +20,7 @@ define('VENDORS_DIR', BASE_DIR . 'vendors/');
 define('LIB_DIR', BASE_DIR . 'lib/');
 define('LIBMODEL_DIR', BASE_DIR . 'lib/models/');
 define('LIBFORM_DIR', BASE_DIR . 'lib/form/');
+define('DICO_DIR', BASE_DIR . 'app/i18n/');
 
 if (!defined('NOAUTOLOAD') || !NOAUTOLOAD)
 {
@@ -33,4 +34,5 @@ if (!defined('NOAUTOLOAD') || !NOAUTOLOAD)
   Autoloader::addPath(LIB_DIR);
   Autoloader::addPath(LIBMODEL_DIR);
   Autoloader::addPath(LIBFORM_DIR);
+  Autoloader::addPath(DICO_DIR);
 }

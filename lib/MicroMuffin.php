@@ -11,6 +11,9 @@ namespace Lib;
 
 class MicroMuffin
 {
+  const ENV_DEV  = 0;
+  const ENV_PROD = 1;
+
   /** @var MicroMuffin */
   private static $instance = null;
 
@@ -88,8 +91,12 @@ class MicroMuffin
     //View displaying
     if ($this->controller->getRender() != "false")
     {
+      Internationalization::init();
+      $twig_options = array('cache' => false, 'autoescape' => false, 'strict_variables' => true);
+
       $loader = new \Twig_Loader_Filesystem('../' . VIEW_DIR . strtolower($this->route['controller']));
-      $twig   = new \Twig_Environment($loader, array('cache' => false, 'autoescape' => false, 'strict_variables' => true));
+      $twig   = new \Twig_Environment($loader, $twig_options);
+      $twig->addFilter("tr", new \Twig_Filter_Function("\\Lib\\Internationalization::translate"));
 
       $page = $twig->render($this->action . ".html.twig", $this->controller->getVariables());
 
@@ -97,7 +104,8 @@ class MicroMuffin
       if ($this->controller->getRenderLayout() != "false")
       {
         $loader = new \Twig_Loader_Filesystem('../' . VIEW_DIR . 'base');
-        $twig   = new \Twig_Environment($loader, array('cache' => false, 'autoescape' => false, 'strict_variables' => true));
+        $twig   = new \Twig_Environment($loader, $twig_options);
+        $twig->addFilter("tr", new \Twig_Filter_Function("\\Lib\\Internationalization::translate"));
 
         $base = new \BaseController();
         $base->layout();
