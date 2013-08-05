@@ -507,6 +507,27 @@ class Generator
     }
   }
 
+  private function writeTakeProcedure($tableName)
+  {
+    $procedureName = 'take' . $tableName;
+    $pdo           = PDOS::getInstance();
+
+    $pdo->beginTransaction();
+
+    $pdo->exec("
+    CREATE OR REPLACE FUNCTION $procedureName(numeric, numeric)
+    RETURNS SETOF $tableName AS
+    'SELECT * FROM $tableName OFFSET \$1 LIMIT \$2'
+    LANGUAGE sql VOLATILE
+    COST 100
+    ROWS 1000;
+    ALTER FUNCTION $procedureName(numeric, numeric)
+    OWNER TO " . DBUSER . ";
+    ");
+
+    $pdo->commit();
+  }
+
   /**
    * @param \Lib\EPO $pdo
    * @param string $tableName
@@ -937,15 +958,11 @@ class Generator
       $this->writeAllProcedure($pdo, $originalTableName);
       $this->writeLine(' getall' . $originalTableName . '() function written in database');
 
-      /*
-      if ($this->haveId($originalTableName))
-      {
-        $this->writeFindProcedure($pdo, $originalTableName);
-        $this->writeLine(' get' . substr($originalTableName, 0, -1) . 'fromid() function written in database');
-      }
-      */
       $this->writeCountProcedure($pdo, $originalTableName);
       $this->writeLine(' count' . $originalTableName . '() function written in database');
+
+      $this->writeTakeProcedure($originalTableName);
+      $this->writeLine(' take' . $originalTableName . '() function written in database');
 
       $this->writeLine("");
     }

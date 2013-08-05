@@ -19,6 +19,8 @@ abstract class Readable extends Model
   protected static $procstock_all = null;
   /** @var string|null */
   protected static $procstock_count = null;
+  /** @var string|null */
+  protected static $procstock_take = null;
   /** @var array */
   protected static $primary_keys = array();
 
@@ -67,5 +69,39 @@ abstract class Readable extends Model
     $result = $query->fetch();
 
     return intval($result[$proc]);
+  }
+
+  /**
+   * @param $number
+   * @param int $offset
+   * @param null $order
+   * @return $this[]
+   */
+  public static function take($number, $offset = 0, $order = null)
+  {
+    $class = strtolower(get_called_class());
+    $proc  = self::$procstock_take != null ? self::$procstock_count : 'take' . $class . 's';
+    $pdo   = PDOS::getInstance();
+
+    if (is_null($order))
+      $query = $pdo->prepare('SELECT * FROM ' . $proc . '(:start, :number)');
+    else
+    {
+      $query = $pdo->prepare('SELECT * FROM ' . $proc . '(:start, :number) ORDER BY :order');
+      $query->bindValue(':order', $order);
+    }
+    $query->bindValue(':start', $offset);
+    $query->bindValue(':number', $number);
+    $query->execute();
+
+    $datas   = $query->fetchAll();
+    $outputs = array();
+    foreach ($datas as $d)
+    {
+      $object = new $class();
+      self::hydrate($object, $d);
+      $outputs[] = $object;
+    }
+    return $outputs;
   }
 }
