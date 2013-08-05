@@ -11,7 +11,7 @@ namespace Lib\Models;
 
 use Lib\PDOS;
 
-class Deletable extends Writable
+abstract class Deletable extends Writable
 {
   /**
    * Delete the models from the database

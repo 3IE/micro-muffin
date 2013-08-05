@@ -12,7 +12,7 @@ namespace Lib\Models;
 use Lib\EPO;
 use Lib\PDOS;
 
-class Writable extends Readable
+abstract class Writable extends Readable
 {
   /** @var bool */
   private $_modified = true;
@@ -72,7 +72,7 @@ class Writable extends Readable
       if ($this->_id == 0)
         $this->add($pdo, $table, $fields, $values, $attributes);
       else
-        $this->update($pdo, $table, $attributes);
+        $this->update();
     }
   }
 
@@ -104,31 +104,5 @@ class Writable extends Readable
     $pdo->commit();
   }
 
-  /**
-   * @param EPO $pdo
-   * @param $table
-   * @param array $attributes
-   */
-  private function update(EPO $pdo, $table, Array $attributes)
-  {
-    $sql = 'UPDATE ' . $table . ' SET ';
-
-    $set = '';
-    foreach ($attributes as $k => $v)
-    {
-      if ($k != 'id')
-        $set .= $k . ' = :' . $k . ', ';
-    }
-    $set = substr($set, 0, -2);
-    $sql .= $set . ' WHERE id = :id';
-
-    $pdo->beginTransaction();
-    $query = $pdo->prepare($sql);
-    foreach ($attributes as $k => $v)
-    {
-      $query->bindValue(':' . $k, $v);
-    }
-    $query->execute();
-    $pdo->commit();
-  }
+  protected abstract function update();
 }

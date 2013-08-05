@@ -11,7 +11,7 @@ namespace Lib\Models;
 
 use Lib\PDOS;
 
-class Readable extends Model
+abstract class Readable extends Model
 {
   /** @var string|null */
   protected static $procstock_find = null;
@@ -21,39 +21,6 @@ class Readable extends Model
   protected static $procstock_count = null;
   /** @var array */
   protected static $primary_keys = array();
-
-  /**
-   * Find a models with the corresponding id
-   *
-   * @param int $id
-   * @return null|Model
-   */
-  /*
-  public static function find($id)
-  {
-    $class        = get_called_class();
-    $classLowered = strtolower($class);
-
-    $stored_procedure = self::$procstock_find != null ? self::$procstock_find : 'get' . $classLowered . 'fromid';
-
-    $pdo = PDOS::getInstance();
-    $req = $pdo->prepare('SELECT * FROM ' . $stored_procedure . '(:id)');
-    $req->bindValue(':id', $id, \PDO::PARAM_INT);
-    $req->execute();
-
-    $result = $req->fetch();
-
-    if (!is_null($result) && !is_null($result['id']))
-    {
-      $output_object = new $class();
-      self::hydrate($output_object, $result);
-
-      return $output_object;
-    }
-    else
-      return null;
-  }
-  */
 
   /**
    * Find all models in database

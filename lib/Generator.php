@@ -302,19 +302,54 @@ class Generator
   }
 
   /**
+   * @param string $tableName
+   * @return string
+   */
+  private function writeUpdateFunction($tableName)
+  {
+    $str = '';
+
+    $str .= TAB . "public function update()\n";
+    $str .= TAB . "{\n";
+    $str .= TAB . TAB . "\$sql        = 'UPDATE $tableName SET ';\n";
+    $str .= TAB . TAB . "\$set        = '';\n";
+    $str .= TAB . TAB . "\$where      = '';\n";
+    $str .= TAB . TAB . "\$attributes = \$this->getAttributes(new \\ReflectionClass(\$this));\n";
+    $str .= TAB . TAB . "foreach (\$attributes as \$k => \$v)\n";
+    $str .= TAB . TAB . TAB . "if (!in_array(\$k, self::\$primary_keys))\n";
+    $str .= TAB . TAB . TAB . TAB . "\$set .= \$k . ' = :' . \$k . ', ';\n";
+    $str .= TAB . TAB . "foreach (self::\$primary_keys as \$pk)\n";
+    $str .= TAB . TAB . TAB . "\$where .= \$pk . ' = :' . \$pk . ' AND ';\n";
+    $str .= TAB . TAB . "\$where = substr(\$where, 0, -5);\n";
+    $str .= TAB . TAB . "\$set = substr(\$set, 0, -2);\n";
+    $str .= TAB . TAB . "\$sql .= \$set . ' WHERE ' . \$where;\n";
+    $str .= TAB . TAB . "\$pdo = \\Lib\\PDOS::getInstance();\n";
+    $str .= TAB . TAB . "\$pdo->beginTransaction();\n";
+    $str .= TAB . TAB . "\$query = \$pdo->prepare(\$sql);\n";
+    $str .= TAB . TAB . "foreach(\$attributes as \$k => \$v)\n";
+    $str .= TAB . TAB . TAB . "\$query->bindValue(':' . \$k, \$v);\n";
+    $str .= TAB . TAB . "\$query->execute();\n";
+    $str .= TAB . TAB . "\$pdo->commit();\n";
+    $str .= TAB . "}\n\n";
+
+    return $str;
+  }
+
+  /**
    * @param $tableName
    * @param $primaryKeys
    * @return string
    */
   private function writeFindFunction($tableName, $primaryKeys)
   {
-    $str       = '';
-    $className = $this->removeSFromTableName($tableName);
+    $str          = '';
+    $className    = $this->removeSFromTableName($tableName);
+    $className[0] = strtoupper($className[0]);
+    $params       = '';
+    $proto        = '';
+    $placeholder  = '';
+    $checkNull    = '';
 
-    $params      = '';
-    $proto       = '';
-    $placeholder = '';
-    $checkNull   = '';
     foreach ($primaryKeys as $pk)
     {
       $params .= TAB . " * @param \$" . $pk['name'] . "\n";
@@ -438,6 +473,7 @@ class Generator
       }
 
       fwrite($file, $this->writeFindFunction($originalTableName, $this->primaryKeys[$originalTableName]));
+      fwrite($file, $this->writeUpdateFunction($originalTableName));
       fwrite($file, $this->writeOverrideAllFunctions(substr($className, 2)));
 
       fwrite($file, "}\n");
