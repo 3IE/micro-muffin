@@ -309,7 +309,7 @@ class Generator
   {
     $str = '';
 
-    $str .= TAB . "public function update()\n";
+    $str .= TAB . "protected function update()\n";
     $str .= TAB . "{\n";
     $str .= TAB . TAB . "\$sql        = 'UPDATE $tableName SET ';\n";
     $str .= TAB . TAB . "\$set        = '';\n";
