@@ -110,8 +110,6 @@ class Router
           $route_chunk = $route_chunks[$i];
           if (self::isParameter($route_chunk, self::SYMBOL_MANDATORY))
           {
-            var_dump(self::PARAM_MANDATORY_REGEXP);
-            var_dump($url_chunk);
             if (preg_match(self::PARAM_MANDATORY_REGEXP, $url_chunk))
             {
               $parameter_name              = ltrim($route_chunk, self::SYMBOL_MANDATORY);

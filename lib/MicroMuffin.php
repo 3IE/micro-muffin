@@ -51,7 +51,6 @@ class MicroMuffin
     //Route determination
     $url   = Tools::getParam("url", null);
     $route = Router::get(!is_null($url) ? $url : "");
-    var_dump($route);
     if (!is_null($route))
       $this->route = $route;
     else
