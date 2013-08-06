@@ -9,6 +9,9 @@
 
 namespace Lib;
 
+use Lib\Router\Route;
+use Lib\Router\Router;
+
 class MicroMuffin
 {
   const ENV_DEV  = 0;
@@ -17,7 +20,7 @@ class MicroMuffin
   /** @var MicroMuffin */
   private static $instance = null;
 
-  /** @var array */
+  /** @var Route */
   private $route;
 
   /** @var Controller */
@@ -48,7 +51,8 @@ class MicroMuffin
     //Route determination
     $url   = Tools::getParam("url", null);
     $route = Router::get(!is_null($url) ? $url : "");
-    if ($route)
+    var_dump($route);
+    if (!is_null($route))
       $this->route = $route;
     else
     {
@@ -59,23 +63,23 @@ class MicroMuffin
 
   private function checkRoute()
   {
-    $className = $this->route['controller'] . 'Controller';
+    $className = $this->route->getController() . 'Controller';
     if (class_exists($className))
     {
       $this->controller = new $className();
-      if (method_exists($this->controller, $this->route['action']))
-        $this->action = $this->route['action'];
+      if (method_exists($this->controller, $this->route->getAction()))
+        $this->action = $this->route->getAction();
       else
       {
         //Undefined action
-        $e = new \Error('Undefined action', 'Action ' . $this->route['action'] . ' doesn\'t exist on ' . $this->route['controller'] . ' controller.');
+        $e = new \Error('Undefined action', 'Action ' . $this->route->getAction() . ' doesn\'t exist on ' . $this->route['controller'] . ' controller.');
         $e->display();
       }
     }
     else
     {
       //Undefined controller
-      $e = new \Error('Undefined controller', $this->route['controller'] . ' doesn\'t exist.');
+      $e = new \Error('Undefined controller', $this->route->getController() . ' doesn\'t exist.');
       $e->display();
     }
   }
@@ -83,10 +87,10 @@ class MicroMuffin
   private function execute()
   {
     if (method_exists($this->controller, 'before_filter'))
-      $this->controller->before_filter($this->route['params']);
+      $this->controller->before_filter($this->route->getParameters());
 
     $action = $this->action;
-    $this->controller->$action($this->route['params']);
+    $this->controller->$action($this->route->getParameters());
 
     //View displaying
     if ($this->controller->getRender() != "false")
@@ -94,7 +98,7 @@ class MicroMuffin
       Internationalization::init();
       $twig_options = array('cache' => false, 'autoescape' => false, 'strict_variables' => true);
 
-      $loader = new \Twig_Loader_Filesystem('../' . VIEW_DIR . strtolower($this->route['controller']));
+      $loader = new \Twig_Loader_Filesystem('../' . VIEW_DIR . strtolower($this->route->getController()));
       $twig   = new \Twig_Environment($loader, $twig_options);
       $twig->addFilter("tr", new \Twig_Filter_Function("\\Lib\\Internationalization::translate"));
 
@@ -126,11 +130,17 @@ class MicroMuffin
     $this->action     = null;
   }
 
+  /**
+   * @return Route
+   */
   public function getRoute()
   {
     return $this->route;
   }
 
+  /**
+   * @return MicroMuffin
+   */
   public static function getInstance()
   {
     return self::$instance;

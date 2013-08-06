@@ -1,4 +1,4 @@
-<?php
+<!--?php
 /**
  * User: mathieu.savy
  * Date: 25/05/13
@@ -169,3 +169,4 @@ class Router
     self::$filters[] = $filter;
   }
 }
+-->

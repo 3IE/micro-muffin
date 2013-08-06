@@ -5,7 +5,7 @@
  * Time: 12:26
  */
 
-$router = new \Lib\Router();
+$router = new \Lib\Router\Router();
 
 /*
 $router::filter("login", function () {
@@ -15,3 +15,4 @@ $router::filter("login", function () {
 */
 
 $router::add(array("url" => "/", "controller" => "index", "action" => "index"));
+$router::add(array("url" => "/photo/#id/@title", "controller" => "toto", "action" => "toto"));
