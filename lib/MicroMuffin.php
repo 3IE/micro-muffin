@@ -104,18 +104,19 @@ class MicroMuffin
       $page = $twig->render($this->action . ".html.twig", $this->controller->getVariables());
 
       //Base layout execution and displaying
-      if ($this->controller->getRenderLayout() != "false")
+      $layout = $this->controller->getRenderLayout();
+      if ($layout != "false")
       {
         $loader = new \Twig_Loader_Filesystem('../' . VIEW_DIR . 'base');
         $twig   = new \Twig_Environment($loader, $twig_options);
         $twig->addFilter("tr", new \Twig_Filter_Function("\\Lib\\Internationalization::translate"));
 
         $base = new \BaseController();
-        $base->layout();
+        $base->$layout();
         $params          = $base->getVariables();
         $params          = array_merge($params, $this->controller->getLayoutVariables());
         $params['_page'] = $page;
-        echo $twig->render("layout.html.twig", $params);
+        echo $twig->render($layout . ".html.twig", $params);
       }
       else
         echo $page;

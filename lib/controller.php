@@ -21,7 +21,7 @@ class Controller
   protected $render = "true";
 
   /** @var string $render_layout */
-  protected $render_layout = "true";
+  protected $render_layout = "layout";
 
   protected $layout_variables = array();
 
