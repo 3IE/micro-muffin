@@ -71,7 +71,7 @@ class MicroMuffin
       else
       {
         //Undefined action
-        $e = new \Error('Undefined action', 'Action ' . $this->route->getAction() . ' doesn\'t exist on ' . $this->route['controller'] . ' controller.');
+        $e = new \Error('Undefined action', 'Action ' . $this->route->getAction() . ' doesn\'t exist on ' . $this->route->getController() . ' controller.');
         $e->display();
       }
     }
