@@ -36,7 +36,7 @@ class Router
     {
       $filters = array();
       if (array_key_exists("filters", $content))
-        $filters = explode(",", $content['"filters']);
+        $filters = explode(",", $content['filters']);
 
       $route = new Route();
       $route->setAction($content['action']);
