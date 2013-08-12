@@ -883,7 +883,10 @@ class Generator
       else
         $this->tableId[] = $field['table_name'];
       if (!is_null($field['sequence_name']))
-        $sequences[$field['table_name']] = explode(DBSCHEMA . '.', $field['sequence_name'])[1];
+      {
+        $array = explode(DBSCHEMA . '.', $field['sequence_name']);
+        $sequences[$field['table_name']] = $array[1];
+      }
     }
 
     $this->sequences    = $sequences;
