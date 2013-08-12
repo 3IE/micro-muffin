@@ -1,1 +1,1 @@
-<?phpsession_start();require_once('../lib/MicroMuffin.php');\Lib\MicroMuffin::run();
+<?phpsession_start();require_once('../lib-micro-muffin/MicroMuffin.php');\Lib\MicroMuffin::run();

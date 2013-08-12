@@ -5,5 +5,5 @@
  * Time: 15:55
  */
 
-require_once('../lib/Generator.php');
+require_once('../lib-micro-muffin/Generator.php');
 \Lib\Generator::run();

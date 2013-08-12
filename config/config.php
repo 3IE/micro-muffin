@@ -7,9 +7,6 @@
  * To change this template use File | Settings | File Templates.
  */
 
-require_once('../lib/autoloader.php');
-require_once('../lib/MicroMuffin.php');
-
 /* Database configuration */
 define('DBHOST', 'localhost');
 define('DBNAME', 'micro-muffin');
