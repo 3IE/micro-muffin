@@ -12,4 +12,10 @@ class IndexController extends \Lib\Controller
   public function index($params = array())
   {
   }
+
+  public function generate()
+  {
+    \Lib\Generator\Generator::run();
+    $this->render = "false";
+  }
 }

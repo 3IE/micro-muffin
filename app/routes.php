@@ -15,3 +15,4 @@ $router::filter("login", function () {
 */
 
 $router::add(array("url" => "/", "controller" => "index", "action" => "index"));
+$router::add(array("url" => "/generate", "controller" => "index", "action" => "generate"));
