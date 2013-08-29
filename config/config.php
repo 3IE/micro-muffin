@@ -27,3 +27,5 @@ define('LOCALE', 'en_US');
 require_once(__DIR__ . '/../vendors/ref.php');
 ref::config('stylePath', '{:dir}/../public/css/ref.css');
 ref::config('scriptPath', '{:dir}/../public/js/ref.js');
+ref::config('showPrivateMembers', true);
+ref::config('showMethods', false);
