@@ -24,3 +24,6 @@ define('LOCALE', 'en_US');
  * Put your own directories with classes you wanted to be autoloaded
  * Example : \Lib\Autoloader::addPath('app/classes/')
  */
+require_once(__DIR__ . '/../vendors/ref.php');
+ref::config('stylePath', '{:dir}/../public/css/ref.css');
+ref::config('scriptPath', '{:dir}/../public/js/ref.js');
