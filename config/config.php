@@ -8,6 +8,7 @@
  */
 
 /* Database configuration */
+define('DBDRIVER', \Lib\Generator\DriverType::POSTGRESQL);
 define('DBHOST', 'localhost');
 define('DBNAME', 'micro-muffin');
 define('DBSCHEMA', 'public');
