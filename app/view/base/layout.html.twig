@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>micro-muffin</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
-    <link rel="stylesheet" href="/css/bootstrap-responsive.min.css" type="text/css">
+  <title>
+    {% if title is defined %}
+      {{ title }}
+    {% else %}
+      micro-muffin
+    {% endif %}
+  </title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+  <link rel="stylesheet" href="/css/bootstrap-responsive.min.css" type="text/css">
 
-    <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="/js/bootstrap.min.js"></script>
 </head>
 <body>
 <p>
-    <a href="/">Index</a>
+  <a href="/">Index</a>
 </p>
 {{ _page }}
 
 {% if isFlash %}
-    <div class="modal hide fade" id="_flashModal" tabindex="-1" role="dialog">
-        <div class="modal-body">
-            <p>{{ flash }}</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">OK</button>
-        </div>
+  <div class="modal hide fade" id="_flashModal" tabindex="-1" role="dialog">
+    <div class="modal-body">
+      <p>{{ flash }}</p>
     </div>
-    <script type="text/javascript">
-        $("#_flashModal").modal('show');
-    </script>
+    <div class="modal-footer">
+      <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">OK</button>
+    </div>
+  </div>
+  <script type="text/javascript">
+    $("#_flashModal").modal('show');
+  </script>
 {% endif %}
 
 </body>
