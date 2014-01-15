@@ -11,6 +11,10 @@ class IndexController extends \Lib\Controller
 {
   public function index($params = array())
   {
+      $author = new Author();
+      $author->setName('jesgjwbeghjb');
+      $author->newAdd();
+      //$author->save();
   }
 
   public function generate()
