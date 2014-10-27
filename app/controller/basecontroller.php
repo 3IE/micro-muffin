@@ -5,7 +5,7 @@
  * Time: 10:23
  */
 
-class BaseController extends \Lib\Controller
+class BaseController extends \MicroMuffin\Controller
 {
   public function layout($params = array())
   {
@@ -17,13 +17,13 @@ class BaseController extends \Lib\Controller
    */
   private function handleFlash()
   {
-    $flash = \Lib\Controller::getFlash();
+    $flash = \MicroMuffin\Controller::getFlash();
     $this->set('isFlash', false);
     if (!is_null($flash))
     {
       $this->set('isFlash', true);
       $this->set('flash', $flash);
-      \Lib\Controller::emptyFlash();
+      \MicroMuffin\Controller::emptyFlash();
     }
   }
 }

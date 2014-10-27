@@ -5,7 +5,7 @@
  * Time: 12:26
  */
 
-$router = new \Lib\Router\Router();
+$router = new \MicroMuffin\Router\Router();
 
 /*
 $router::filter("login", function () {
@@ -15,4 +15,3 @@ $router::filter("login", function () {
 */
 
 $router::add(array("url" => "/", "controller" => "index", "action" => "index"));
-$router::add(array("url" => "/generate", "controller" => "index", "action" => "generate"));

@@ -5,7 +5,7 @@
  * Time: 15:10
  */
 
-class en_US extends \Lib\Dictionary
+class en_US extends \MicroMuffin\Dictionary
 {
   /**
    * @return array

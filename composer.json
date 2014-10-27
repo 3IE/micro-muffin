@@ -1,10 +1,12 @@
 {
-    "name": "mrblackus/micro-muffin",
+    "name": "mrblackus/myApplication",
     "description": "micro-muffin PHP framework",
-    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Mathieu Savy"
         }
-    ]
+    ],
+    "require": {
+        "mrblackus/micro-muffin": "dev-master"
+    }
 }

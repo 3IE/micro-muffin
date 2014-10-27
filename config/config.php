@@ -8,7 +8,7 @@
  */
 
 /* Database configuration */
-define('DBDRIVER', \Lib\Generator\DriverType::POSTGRESQL);
+define('DBDRIVER', \MicroMuffin\Generator\DriverType::POSTGRESQL);
 define('DBHOST', 'localhost');
 define('DBNAME', 'micro-muffin');
 define('DBSCHEMA', 'public');
@@ -17,16 +17,17 @@ define('DBPASS', 'root');
 define('DISPLAY_SQL_ERROR', true);
 
 /* Application configuration */
-define('ENV', \Lib\MicroMuffin::ENV_DEV);
+define('ENV', \MicroMuffin\MicroMuffin::ENV_DEV);
 define('DEFAULT_LOCALE', 'en_US');
 define('LOCALE', 'en_US');
 
 /*
  * Put your own directories with classes you wanted to be autoloaded
- * Example : \Lib\Autoloader::addPath('app/classes/')
  */
-require_once(__DIR__ . '/../vendors/ref.php');
-ref::config('stylePath', '{:dir}/../public/css/ref.css');
-ref::config('scriptPath', '{:dir}/../public/js/ref.js');
-ref::config('showPrivateMembers', true);
-ref::config('showMethods', false);
+\MicroMuffin\ClassLoader::addDirectories([
+    __DIR__ . '/../app/controller',
+    __DIR__ . '/../app/t_model',
+    __DIR__ . '/../app/l10n',
+    __DIR__ . '/../app/model',
+    __DIR__ . '/../app/sp_model',
+]);

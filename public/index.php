@@ -1,1 +1,1 @@
-<?phpsession_start();require_once('../lib-micro-muffin/MicroMuffin.php');\Lib\MicroMuffin::run();
+<?phpsession_start();require_once('../vendor/autoload.php');require_once('../config/config.php');require_oncE('../app/routes.php');\MicroMuffin\MicroMuffin::run();
