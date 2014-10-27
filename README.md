@@ -9,5 +9,10 @@ Its philosophy is quite different than others framework, because **database desi
 * PHP 5.3
 * Postgresql 8.3
 
+## Installation
+```
+composer install
+```
+
 ##Warning
 micro-muffin is still in development. It is not fully tested yet, and not totally functional. Please don't use it for real project for now.
