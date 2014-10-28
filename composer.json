@@ -7,6 +7,6 @@
         }
     ],
     "require": {
-        "mrblackus/micro-muffin": "dev-master"
+        "mrblackus/micro-muffin": "1.3.*"
     }
 }
