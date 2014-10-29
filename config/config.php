@@ -21,6 +21,8 @@ define('ENV', \MicroMuffin\MicroMuffin::ENV_DEV);
 define('DEFAULT_LOCALE', 'en_US');
 define('LOCALE', 'en_US');
 
+\MicroMuffin\Log::setLogDirectory(__DIR__ . '/../log/');
+
 /*
  * Put your own directories with classes you wanted to be autoloaded
  */
